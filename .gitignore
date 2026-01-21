@@ -2,3 +2,4 @@ run.exe
 run
 build/
 data/
+processing/__pycache__
