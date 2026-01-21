@@ -59,15 +59,16 @@ double sampleSigB()
 }
 
 
-bool crossSecAcceptReject(double mu_i, double targetOmega, crossSecFunc crossSec, double max)
+double crossSecAcceptReject(double mu_i, double targetOmega, crossSecFunc crossSec, double max)
 {
+    // Either returns 0 for a reject, or the prob for an accept
     double probability = crossSec(mu_i, targetOmega);
 
     double x = getRandom(0, max);
 
     if (x < probability)
     {
-        return true;
+        return probability;
     }
-    return false;
+    return 0.0;
 }

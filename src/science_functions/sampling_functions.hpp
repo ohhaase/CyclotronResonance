@@ -7,4 +7,4 @@ double sampleDiffCrossSection(double mu_i, double w_i, diffCrossSecFunc diffCros
 
 double sampleSigB();
 
-bool crossSecAcceptReject(double mu_i, double targetOmega, crossSecFunc crossSec, double max);
+double crossSecAcceptReject(double mu_i, double targetOmega, crossSecFunc crossSec, double max);

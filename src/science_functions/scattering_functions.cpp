@@ -254,9 +254,9 @@ double performScatter(PhotonState& photon, int recoil)
             {
                 case -1: // Should only be used when doing polarization averaged
                 {
-                    bool avgChosen = crossSecAcceptReject(mu_i, targetOmega, averageMagTotalCrossSec, averageMagTotalCrossSecMax(mu_i));
+                    double avgProbability = crossSecAcceptReject(mu_i, targetOmega, averageMagTotalCrossSec, averageMagTotalCrossSecMax(mu_i));
 
-                    if (avgChosen)
+                    if (avgProbability != 0.0)
                     {
                         foundElectron = true;
                         scatterType = 0;
@@ -267,8 +267,11 @@ double performScatter(PhotonState& photon, int recoil)
                 {
                     // Need to decide between pl2pl and pl2pr
 
-                    bool pl2plChosen = crossSecAcceptReject(mu_i, targetOmega, pl2plTotalCrossSec, pl2plTotalCrossSecMax(mu_i));
-                    bool pl2prChosen = crossSecAcceptReject(mu_i, targetOmega, pl2prTotalCrossSec, pl2prTotalCrossSecMax(mu_i));
+                    double pl2plProb = crossSecAcceptReject(mu_i, targetOmega, pl2plTotalCrossSec, pl2plTotalCrossSecMax(mu_i));
+                    double pl2prProb = crossSecAcceptReject(mu_i, targetOmega, pl2prTotalCrossSec, pl2prTotalCrossSecMax(mu_i));
+
+                    bool pl2plChosen = (pl2plProb != 0.0);
+                    bool pl2prChosen = (pl2prProb != 0.0);
 
                     // If either individually are found, choose them
                     if (pl2plChosen)
@@ -283,13 +286,13 @@ double performScatter(PhotonState& photon, int recoil)
                         scatterType = 3;
                     }
 
-                    // In case that both are accepted, choose randomly between them
+                    // In rare case that both are accepted, choose randomly between them
                     if (pl2plChosen && pl2prChosen)
                     {
                         foundElectron = true;
-                        double x = getRandom(0, 1);
+                        double x = getRandom(0, pl2plProb + pl2prProb);
                         
-                        if (x < 0.5)
+                        if (x < pl2plProb)
                         {
                             // pl2pl
                             scatterType = 4;
@@ -308,26 +311,11 @@ double performScatter(PhotonState& photon, int recoil)
                 {
                     // Need to decide between pr2pl and pr2pr
 
-                    bool pr2plChosen = crossSecAcceptReject(mu_i, targetOmega, pr2plTotalCrossSec, pr2plTotalCrossSecMax(mu_i));
-                    bool pr2prChosen = crossSecAcceptReject(mu_i, targetOmega, pr2prTotalCrossSec, pr2prTotalCrossSecMax(mu_i));
+                    double pr2plProb = crossSecAcceptReject(mu_i, targetOmega, pr2plTotalCrossSec, pr2plTotalCrossSecMax(mu_i));
+                    double pr2prProb = crossSecAcceptReject(mu_i, targetOmega, pr2prTotalCrossSec, pr2prTotalCrossSecMax(mu_i));
 
-                    if (pr2plChosen && pr2prChosen)
-                    {
-                        foundElectron = true;
-                        // In rare case that both are accepted, choose randomly between them
-                        double x = getRandom(0, 1);
-                        
-                        if (x < 0.5)
-                        {
-                            // pr2pl
-                            scatterType = 2;
-                        }
-                        else
-                        {
-                            // pr2pr
-                            scatterType = 1;
-                        }
-                    }
+                    bool pr2plChosen = (pr2plProb != 0.0);
+                    bool pr2prChosen = (pr2prProb != 0.0);
 
                     // If either individually are found, choose them
                     if (pr2plChosen)
@@ -340,6 +328,24 @@ double performScatter(PhotonState& photon, int recoil)
                     {
                         foundElectron = true;
                         scatterType = 1;
+                    }
+
+                    // In rare case that both are accepted, choose randomly between them
+                    if (pr2plChosen && pr2prChosen)
+                    {
+                        foundElectron = true;
+                        double x = getRandom(0, pr2plProb + pr2prProb);
+                        
+                        if (x < pr2plProb)
+                        {
+                            // pr2pl
+                            scatterType = 2;
+                        }
+                        else
+                        {
+                            // pr2pr
+                            scatterType = 1;
+                        }
                     }
 
                     // Otherwise, nothing is chosen yet
