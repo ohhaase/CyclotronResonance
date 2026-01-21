@@ -294,3 +294,89 @@ void simType5()
         }
     }
 }
+
+
+void simType6()
+{
+    // Outputs both average and histogram data
+    // Performs 4 different temp simulations (low temp, uses MB)
+    // No recoil
+    // Intended for pairing with the scatter num cutoffs
+
+    double Thetas[4] = {0.01, 0.007, 0.005, 0.001};
+
+    electronDistb.setDistb(0); // MB distb
+
+    // Loop over electron temeperatures
+    for (int i = 0; i < 4; i++)
+    {
+        electronDistb.updateTheta(Thetas[i]);
+
+        // Unique folder
+        std::string folderName = std::to_string(i);
+
+        std::filesystem::create_directory(folderName);
+
+        // Initialize output file for average data
+        std::ofstream outputFile(folderName + "/" + "avgdata.csv");
+
+        // Initialize histograms
+        Histogram everyNRGHist{Nbins, lowerOmega, upperOmega};
+        Histogram finalNRGHist{Nbins, finalNRGlow, finalNRGhigh, true};
+        Histogram everyThetaHist{Nbins, 0, M_PI};
+        Histogram finalThetaHist{Nbins, 0, M_PI};
+        Histogram everyBetaHist{Nbins, -1, 1};
+        Histogram finalCountHist{Nbins, 1, 100000, true};
+
+        // Initialize 2D histograms
+        Histogram2D nrgXnrgHist2D{Nbins, Nbins, lowerOmega, upperOmega, finalNRGlow, finalNRGhigh, false, true};
+        Histogram2D nrgXthetaHist2D{Nbins, Nbins, lowerOmega, upperOmega, 0, M_PI};
+        Histogram2D thetaXnrgHist2D{Nbins, Nbins, 0, M_PI, finalNRGlow, finalNRGhigh, false, true};
+        Histogram2D thetaXthetaHist2D{Nbins, Nbins, 0, M_PI, 0, M_PI};
+        Histogram2D finalValsHist2D{Nbins, Nbins, finalNRGlow, finalNRGhigh, 0, M_PI, true, false};
+
+        // Loop over each energy bin
+        for (int ii = 0; ii < Nbins; ii++)
+        {
+            // Linear spacing between the two limits (at center of bins)
+            double omega = lowerOmega + (double)(ii+0.5)/Nbins * (upperOmega - lowerOmega);
+            
+            // Loop over each angle bin
+            for (int jj = 0; jj < Nbins; jj++)
+            {
+                // Linear spacing from 0 to pi (at center of bins)
+                double theta = (double)(jj + 0.5)/Nbins * M_PI;
+
+                // Bin N particles
+                AvgPhotonState avgPhoton = avgAndBinNParticles(omega, theta, 0, Nparticles, 0, 
+                    everyNRGHist, finalNRGHist, everyThetaHist, finalThetaHist, everyBetaHist, finalCountHist,
+                    nrgXnrgHist2D, thetaXnrgHist2D, nrgXthetaHist2D, thetaXthetaHist2D, finalValsHist2D);
+
+                // Write these averages to output file with the current hist coordinates
+                outputFile << omega << "," << theta << "," << avgPhoton.omega << "," 
+                    << avgPhoton.theta << "," << avgPhoton.numScatterings << "," << avgPhoton.polarization << "\n";
+
+                loadingBar(Nbins, ii, jj);
+            }
+        }
+
+        // Close avg file
+        outputFile.close();
+
+        // Export histograms
+        everyNRGHist.exportToFile("nrg", folderName);
+        everyThetaHist.exportToFile("theta", folderName);
+        everyBetaHist.exportToFile("beta", folderName);
+
+        finalNRGHist.exportToFile("esc_nrg", folderName);
+        finalThetaHist.exportToFile("esc_theta", folderName);
+        finalCountHist.exportToFile("num", folderName);
+
+        nrgXnrgHist2D.exportToFile("nrgXnrg", folderName);
+        nrgXthetaHist2D.exportToFile("nrgXtheta", folderName);
+        thetaXnrgHist2D.exportToFile("thetaXnrg", folderName);
+        thetaXthetaHist2D.exportToFile("thetaXtheta", folderName);
+
+        finalValsHist2D.exportToFile("finalVals", folderName);
+    }
+}

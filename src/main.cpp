@@ -49,6 +49,16 @@ int main(int argc, char** argv)
             simType4();
             break;
         }
+        case 5:
+        {
+            std::cout << "Not yet implemented.\n";
+            break;
+        }
+        case 6:
+        {
+            simType6();
+            break;
+        }
         default:
         {
             std::cout << "Error with simtype\n";
