@@ -3,3 +3,4 @@ run
 build/
 data/
 processing/__pycache__
+**/.DS_Store
