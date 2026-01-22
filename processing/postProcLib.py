@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import os
+
 # Function for importing raw data from csv file
 def importData(filePath):
     return np.genfromtxt(filePath, delimiter=',')
@@ -18,13 +20,19 @@ def importAverages(runFilePath, simParams):
     avgNum = np.reshape(rawdata[:, 4], [Nbins, Nbins])
     avgPol = np.reshape(rawdata[:, 5], [Nbins, Nbins])
 
+    if np.shape(rawdata)[1] > 5:
+        binTimings = np.reshape(rawdata[:, 6], [Nbins, Nbins])
+    else:
+        binTimings = np.zeros_like(omegas)
+
     avgData = {
         "w": omegas,
         "th": thetas,
         "w_avg": avgOmegas,
         "th_avg": avgThetas,
         "N_avg": avgNum,
-        "pol_avg": avgPol
+        "pol_avg": avgPol,
+        "timings": binTimings
     }
 
     return avgData
@@ -152,7 +160,7 @@ def tagsFromSubFolder(folder, quadRunName):
 
 # Function to get all 4 runs from a single 4-run
 def importQuadRunData(quadRunName):
-    rawParams = importData(f"data/{quadRunName}/simParams.csv")
+    rawParams = importData(f"../data/{quadRunName}/simParams.csv")
 
     Nparticles = rawParams[0]
     Nbins = rawParams[1].astype(int)
@@ -168,7 +176,7 @@ def importQuadRunData(quadRunName):
     runs = []
 
     for folder in folderNames:
-        runData = importSubRunData(f"data/{quadRunName}/{folder}", simParams)
+        runData = importSubRunData(f"../data/{quadRunName}/{folder}", simParams)
 
         runTags = tagsFromSubFolder(folder, quadRunName)
 
@@ -184,7 +192,7 @@ def importQuadRunData(quadRunName):
 
 # Function to get all 4 runs from a 4x scatternum run
 def importScatterNumData(scatterLim):
-    rawParams = importData(f"data/scatterNum_{scatterLim}/simParams.csv")
+    rawParams = importData(f"../data/scatterNum_{scatterLim}/simParams.csv")
 
     Nparticles = rawParams[0]
     Nbins = rawParams[1].astype(int)
@@ -201,7 +209,7 @@ def importScatterNumData(scatterLim):
     runs = []
 
     for folder in folderNames:
-        runData = importSubRunData(f"data/scatterNum_{scatterLim}/{folder}", simParams)
+        runData = importSubRunData(f"../data/scatterNum_{scatterLim}/{folder}", simParams)
 
         runTags = {
             "Theta": folderTemps[int(folder)],
@@ -232,5 +240,8 @@ def plotAllKeys(keys, plotFunc):
             plotFunc(key, i, axes[i])
 
         plt.show()
+
+def test():
+    print(os.getcwd())
 
 myMap = 'inferno'

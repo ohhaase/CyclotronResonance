@@ -186,6 +186,9 @@ void simType4()
                     // Linear spacing from 0 to pi (at center of bins)
                     double theta = (double)(jj + 0.5)/Nbins * M_PI;
 
+                    // Initialize timer for bin
+                    Timer binTimer;
+
                     // Bin N particles
                     AvgPhotonState avgPhoton = avgAndBinNParticles(omega, theta, 0, Nparticles, recoils[j], 
                         everyNRGHist, finalNRGHist, everyThetaHist, finalThetaHist, everyBetaHist, finalCountHist,
@@ -193,7 +196,8 @@ void simType4()
 
                     // Write these averages to output file with the current hist coordinates
                     outputFile << omega << "," << theta << "," << avgPhoton.omega << "," 
-                        << avgPhoton.theta << "," << avgPhoton.numScatterings << "," << avgPhoton.polarization << "\n";
+                        << avgPhoton.theta << "," << avgPhoton.numScatterings << "," << avgPhoton.polarization 
+                        << "," << binTimer.elapsedMicro() << "\n";
 
                     loadingBar(Nbins, ii, jj);
                 }
