@@ -126,6 +126,50 @@ void Histogram2D::addVal(double xValue, double yValue, int pol)
 }
 
 
+void Histogram2D::overrideVal(double xValue, double yValue, int pol, int val)
+{
+    int* thisCount = counts_par;
+
+    switch (pol)
+    {
+        case -1: // Average polarization
+        {
+            // In this case, we just treat parallel count as the total count
+            thisCount = counts_par;
+            break;
+        }
+        case 0: // Parallel
+        {
+            thisCount = counts_par;
+            break;
+        }
+        case 1: // Perp
+        {
+            thisCount = counts_perp;
+            break;
+        }
+
+    }
+
+    // Loop over all bins to see which it goes in
+    // Since this will usually be used as a 2D array, these should be unique if cell centered
+    for (int i = 0; i < numBinsX; i++)
+    {
+        if ((binWallsX[i] <= xValue) && (xValue < binWallsX[i+1]))
+        {
+            for (int j = 0; j < numBinsY; j++)
+            {
+                if ((binWallsY[j] <= yValue) && (yValue < binWallsY[j+1]))
+                {
+                    thisCount[i*numBinsY + j] = val;
+                    return; // Stop if we found it
+                }
+            }
+        }
+    }
+}
+
+
 void Histogram2D::exportToFile(const std::string& name, const std::string& folder)
 {
     std::string fileName = "hist2D_" + name + ".csv";
