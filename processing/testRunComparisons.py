@@ -26,7 +26,7 @@ import postProcLib
 # Ncores will change
 
 # %%
-testRuns = ["mac_1thread"] #, "mac_4thread", "mac_8thread", "mac_16thread"]
+testRuns = ["mac_1thread", "mac_4thread", "mac_8thread", "mac_16thread"]
 
 data = []
 
@@ -35,9 +35,32 @@ for testRun in testRuns:
     
 
 # %%
+# Timing data
+def plotTimingData(key, i, ax):
+    # Key is just here so we can use the plotAllKeys func to get 4 graphs
+    theseScatterPoints = []
+
+    for j, testRun in enumerate(testRuns):
+        timing = np.sum(data[j*4 + i]["data"]["avgData"]["timings"]/1e6)
+
+        theseScatterPoints.append(timing)
+
+    ax.bar(testRuns, theseScatterPoints)
+
+    if (i == 0):
+        ax.set_ylabel("Time (sec)")
+    
+    plt.setp(ax.get_xticklabels(), rotation=30, ha='right')
+
+postProcLib.plotAllKeys([""], plotTimingData)
+
+
+# %%
+# Plot avg data for one run
+
 def plotAvgData(key, i, ax):
     # Get relevant average data
-    thisAvgDict = data[i]["data"]["avgData"]
+    thisAvgDict = data[12+i]["data"]["avgData"]
 
     omegas = thisAvgDict["w"]
     thetas = thisAvgDict["th"]
