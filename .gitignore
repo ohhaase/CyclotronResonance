@@ -2,5 +2,6 @@ run.exe
 run
 build/
 data/
-processing/__pycache__
+**/__pycache__
 **/.DS_Store
+*.ipynb
