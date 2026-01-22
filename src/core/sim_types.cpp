@@ -139,8 +139,8 @@ void simType4()
     // Theta = 0.025, recoil on
     // Theta = 0.025, recoil off
 
-    // double Thetas[2] = {0.05, 0.025};
-    double Thetas[2] = {0.01, 0.005};
+    double Thetas[2] = {0.05, 0.025};
+    // double Thetas[2] = {0.01, 0.005};
     int recoils[2] = {0, 1}; 
 
     // Loop over electron temeperatures
