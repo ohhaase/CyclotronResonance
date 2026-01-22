@@ -183,7 +183,8 @@ def importQuadRunData(quadRunName):
         thisRun = {
             "params": simParams,
             "tags": runTags,
-            "data": runData
+            "data": runData,
+            "name": folder
         }
 
         runs.append(thisRun)
@@ -240,6 +241,23 @@ def plotAllKeys(keys, plotFunc):
             plotFunc(key, i, axes[i])
 
         plt.show()
+
+def titleFromFolder(folder):
+    Theta = 0
+    pol = ""
+    recoil = ""
+
+    if folder[0] == "0":
+        Theta = 0.05
+    else:
+        Theta = 0.025
+
+    if folder[1] == "0":
+        recoil = "No Recoil"
+    else:
+        recoil = "Recoil"
+
+    return rf"{recoil}, $\Theta=$ {Theta}"
 
 def test():
     print(os.getcwd())
