@@ -35,6 +35,61 @@ for testRun in testRuns:
     
 
 # %%
+# Angular hists (This is what we're trying to make sure works!)
+def plotHistData(key, i, ax):
+    
+    for j, testRun in enumerate(testRuns):
+        
+        # Get relevant average data
+        thisHist = data[j*4 + i]["data"]["hists"][key]
+
+        countType = "totalCounts"
+        # countType = "parCounts"
+        # countType = "perpCounts"
+
+        xWalls = thisHist["walls"]
+        xVals = np.linspace((xWalls[0]+xWalls[1])/2, (xWalls[-2] + xWalls[-1])/2, xWalls.size-1) # Cell centered xvals
+
+        plotVals = thisHist[countType]/np.trapezoid(thisHist[countType], xVals)
+
+        if (key == "theta"):
+            plotVals = plotVals / np.sin(xVals) - 0.5
+            wallVals = np.cos(xWalls)
+
+        ax.stairs(plotVals, wallVals, fill=False)
+
+    ax.legend(testRuns)
+
+    if (i == 0):
+        match (key):
+            case "beta":
+                name = r"$\beta$"
+            case "nrg" | "esc_nrg":
+                name = r"$\omega$"
+            case "num":
+                name = "Num Scatterings"
+            case "theta" | "esc_theta":
+                name = r"$\theta$"
+        ax.set_xlabel(name)
+        ax.set_ylabel("Relative Counts")
+
+    ax.set_box_aspect(1)
+
+    match (key):
+        case "nrg" | "esc_nrg":
+            ax.set_xscale('log')
+        case "num":
+            ax.set_xscale('log')
+            ax.set_yscale('log')
+        case "theta":
+            ax.hlines(0, -1, 1, "grey", "dashed")
+
+    ax.set_title(postProcLib.titleFromFolder(data[j*4 + i]["name"]))
+
+postProcLib.plotAllKeys(["theta"], plotHistData)
+
+
+# %%
 # Timing data
 def plotTimingData(key, i, ax):
     # Key is just here so we can use the plotAllKeys func to get 4 graphs
