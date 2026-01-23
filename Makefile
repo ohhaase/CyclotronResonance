@@ -101,3 +101,4 @@ include $(wildcard $(DEPFILES))
 # option to clean directories at the end
 clean :
 	@$(call removedir, $(BLDDIR))
+	@$(call removefile,$(EXEC))
