@@ -10,7 +10,7 @@ double getRandom(double min, double max)
     static pcg_extras::seed_seq_from<std::random_device> seed_source;
     
     // Make a random engine
-    static pcg32_fast rng(seed_source);
+    static thread_local pcg32_fast rng(seed_source);
     // std::uniform_real_distribution<> distrib(min, max);
     // return distrib(rng);
 

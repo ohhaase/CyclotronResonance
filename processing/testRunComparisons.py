@@ -26,7 +26,7 @@ import postProcLib
 # Ncores will change
 
 # %%
-testRuns = ["mac_1thread", "mac_4thread", "mac_8thread", "mac_16thread"]
+testRuns = ["mac_1thread", "mac_4thread", "mac_8thread", "mac_16thread", "win_1thread", "win_4thread", "win_8thread", "win_16thread", "win_1thread_local", "win_4thread_local"]
 
 data = []
 
@@ -39,7 +39,7 @@ for testRun in testRuns:
 def plotHistData(key, i, ax):
     
     for j, testRun in enumerate(testRuns):
-        
+            
         # Get relevant average data
         thisHist = data[j*4 + i]["data"]["hists"][key]
 
@@ -51,6 +51,7 @@ def plotHistData(key, i, ax):
         xVals = np.linspace((xWalls[0]+xWalls[1])/2, (xWalls[-2] + xWalls[-1])/2, xWalls.size-1) # Cell centered xvals
 
         plotVals = thisHist[countType]/np.trapezoid(thisHist[countType], xVals)
+        wallVals = xWalls
 
         if (key == "theta"):
             plotVals = plotVals / np.sin(xVals) - 0.5
@@ -96,7 +97,7 @@ def plotTimingData(key, i, ax):
     theseScatterPoints = []
 
     for j, testRun in enumerate(testRuns):
-        timing = np.sum(data[j*4 + i]["data"]["avgData"]["timings"]/1e6)
+        timing = np.sum(data[j*4 + i]["data"]["avgData"]["timings"]/1e6) # / (data[j*4 + i]["params"]["Nparticles"] * data[j*4 + i]["params"]["Nbins"]**2)
 
         theseScatterPoints.append(timing)
 
