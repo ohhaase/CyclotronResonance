@@ -26,7 +26,9 @@ import postProcLib
 # Ncores will change
 
 # %%
-testRuns = ["mac_1thread", "mac_4thread", "mac_8thread", "mac_16thread", "win_1thread", "win_4thread", "win_8thread", "win_16thread", "win_1thread_local", "win_4thread_local"]
+testRuns = ["mac_1thread", "mac_4thread", "mac_8thread", "mac_16thread", 
+            "win_1thread", "win_4thread", "win_8thread", "win_16thread", 
+            "win_1thread_local", "win_4thread_local", "win_8thread_local", "win_16thread_local"]
 
 data = []
 
@@ -87,7 +89,8 @@ def plotHistData(key, i, ax):
 
     ax.set_title(postProcLib.titleFromFolder(data[j*4 + i]["name"]))
 
-postProcLib.plotAllKeys(["theta"], plotHistData)
+# postProcLib.plotAllKeys(["theta"], plotHistData)
+postProcLib.plotAllKeys(["beta", "nrg", "theta", "num", "esc_nrg", "esc_theta"], plotHistData)
 
 
 # %%
