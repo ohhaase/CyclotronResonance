@@ -54,56 +54,61 @@ AvgPhotonState averageNParticles(double omega, double theta, int polarization, i
 
 void binNParticles(double omega, double theta, int polarization, int Nparticles, int recoil, Histogram& totalNrgHist, Histogram& totalBetaHist)
 {
-    // Intialize total histograms
-    Histogram nrgHist{Nbins, lowerOmega, upperOmega};
-    Histogram betaHist{Nbins, -1, 1};
-
+    // Set num of threads
     omp_set_num_threads(Nthreads);
 
-    // Loop over each particle we want in the bin
-    #pragma omp parallel for
-    for (int k = 0; k < Nparticles; k++)
+    // Openmp parallel block
+    #pragma omp parallel
     {
-        // Initialize photon
-        PhotonState photon{omega, theta, 0, polarization}; 
+        // Intialize threadlocal histograms
+        Histogram nrgHist{Nbins, lowerOmega, upperOmega};
+        Histogram betaHist{Nbins, -1, 1};
 
-        // Initialize histograms we want
-        Histogram localNRGHist{Nbins, lowerOmega, upperOmega};
-        Histogram localBetaHist{Nbins, -1, 1};
-
-        // Initialize values that change each loop
-        bool escaped = false; 
-        double beta = 0;
-
-        // Loop until escaped
-        while(!escaped)
+        // Loop over each particle we want in the bin
+        #pragma omp for
+        for (int k = 0; k < Nparticles; k++)
         {
-            beta = performScatter(photon, recoil);
+            // Initialize photon
+            PhotonState photon{omega, theta, 0, polarization}; 
 
-            // Add values to histograms
-            localNRGHist.addVal(photon.omega, photon.polarization);
-            localBetaHist.addVal(beta, photon.polarization);
+            // Initialize per-particle histograms
+            Histogram localNRGHist{Nbins, lowerOmega, upperOmega};
+            Histogram localBetaHist{Nbins, -1, 1};
 
-            escaped = hasEscaped(photon);
-        }
+            // Initialize values that change each loop
+            bool escaped = false; 
+            double beta = 0;
 
-        // Once escaped, combine histograms
-        #pragma omp critical // Needs to be in critical block to avoid race conditions
-        {
+            // Loop until escaped
+            while(!escaped)
+            {
+                beta = performScatter(photon, recoil);
+
+                // Add values to histograms
+                localNRGHist.addVal(photon.omega, photon.polarization);
+                localBetaHist.addVal(beta, photon.polarization);
+
+                escaped = hasEscaped(photon);
+            }
+
+            // Once escaped, combine histograms with thread local hist
             nrgHist.combineData(localNRGHist);
             betaHist.combineData(localBetaHist);
         }
-    }
 
-    // Combine with global histograms
-    totalNrgHist.combineData(nrgHist);
-    totalBetaHist.combineData(betaHist);
+        // Combine thread hist with global histograms
+        #pragma omp critical
+        {
+            totalNrgHist.combineData(nrgHist);
+            totalBetaHist.combineData(betaHist);
+        }
+    }
 }
 
 AvgPhotonState avgAndBinNParticles(double omega, double theta, int polarization, int Nparticles, int recoil, 
-    Histogram& everyNRGHist, Histogram& finalNRGHist, Histogram& everyThetaHist, Histogram& finalThetaHist,
-    Histogram& everyBetaHist, Histogram& finalCountHist, Histogram2D& nrgXnrgHist2D, Histogram2D& thetaXnrgHist2D,
-    Histogram2D& nrgXthetaHist2D, Histogram2D& thetaXthetaHist2D, Histogram2D& finalValsHist2D)
+    Histogram& everyNRGHist_in, Histogram& finalNRGHist_in, Histogram& everyThetaHist_in, Histogram& finalThetaHist_in,
+    Histogram& everyBetaHist_in, Histogram& finalCountHist_in, Histogram2D& nrgXnrgHist2D_in, Histogram2D& thetaXnrgHist2D_in,
+    Histogram2D& nrgXthetaHist2D_in, Histogram2D& thetaXthetaHist2D_in, Histogram2D& finalValsHist2D_in)
 {
     // Initialize average results for each
     double avgOmega = 0;
@@ -113,67 +118,103 @@ AvgPhotonState avgAndBinNParticles(double omega, double theta, int polarization,
 
     omp_set_num_threads(Nthreads);
 
-    // Loop over each particle we want in the bin
-    #pragma omp parallel for reduction(+: avgOmega, avgTheta, avgNum, avgPol)
-    for (int k = 0; k < Nparticles; k++)
+    // Openmp parallel block
+    #pragma omp parallel 
     {
-        // Initialize photon state
-        int thisPol = polarization;
-        if (thisPol == 0)
+        // Intialize threadlocal histograms
+        Histogram everyNRGHist_tl{Nbins, lowerOmega, upperOmega};
+        Histogram finalNRGHist_tl{Nbins, finalNRGlow, finalNRGhigh, true};
+        Histogram everyThetaHist_tl{Nbins, 0, M_PI};
+        Histogram finalThetaHist_tl{Nbins, 0, M_PI};
+        Histogram everyBetaHist_tl{Nbins, -1, 1};
+        Histogram finalCountHist_tl{Nbins, 1, 100000, true};
+
+        Histogram2D nrgXnrgHist2D_tl{Nbins, Nbins, lowerOmega, upperOmega, finalNRGlow, finalNRGhigh, false, true};
+        Histogram2D nrgXthetaHist2D_tl{Nbins, Nbins, lowerOmega, upperOmega, 0, M_PI};
+        Histogram2D thetaXnrgHist2D_tl{Nbins, Nbins, 0, M_PI, finalNRGlow, finalNRGhigh, false, true};
+        Histogram2D thetaXthetaHist2D_tl{Nbins, Nbins, 0, M_PI, 0, M_PI};
+        Histogram2D finalValsHist2D_tl{Nbins, Nbins, finalNRGlow, finalNRGhigh, 0, M_PI, true, false};
+
+        // Loop over each particle we want in the bin
+        #pragma for reduction(+: avgOmega, avgTheta, avgNum, avgPol)
+        for (int k = 0; k < Nparticles; k++)
         {
-            double x = getRandom(0, 1);
-            if (x < 0.5) thisPol = 1;
+            // Initialize photon state
+            int thisPol = polarization;
+            if (thisPol == 0)
+            {
+                double x = getRandom(0, 1);
+                if (x < 0.5) thisPol = 1;
+            }
+
+            PhotonState photon{omega, theta, 0, thisPol}; 
+
+            // Initialize histograms we want on a per-scatter basis
+            Histogram localNRGHist{Nbins, lowerOmega, upperOmega};
+            Histogram localThetaHist{Nbins, 0, M_PI};
+            Histogram localBetaHist{Nbins, -1, 1};
+
+            bool escaped = false; 
+            double beta = 0;
+
+            while(!escaped)
+            {
+                beta = performScatter(photon, recoil);
+
+                // Add values to histograms
+                localNRGHist.addVal(photon.omega, photon.polarization);
+                localThetaHist.addVal(photon.theta, photon.polarization);
+                localBetaHist.addVal(beta, photon.polarization);
+
+                escaped = hasEscaped(photon);
+            }
+
+            // Once escaped, add results to averages
+            avgOmega += photon.omega;
+            avgTheta += photon.theta;
+            avgNum += photon.numScatterings;
+            avgPol += photon.polarization;
+
+            // Combine data for per-scatter hists with threadlocal variants
+            everyNRGHist_tl.combineData(localNRGHist);
+            everyThetaHist_tl.combineData(localThetaHist);
+            everyBetaHist_tl.combineData(localBetaHist);
+
+            // Add data for on-escape hists to threadlocal variants
+            finalNRGHist_tl.addVal(photon.omega, photon.polarization);
+            finalThetaHist_tl.addVal(photon.theta, photon.polarization);
+            finalCountHist_tl.addVal(photon.numScatterings, photon.polarization);
+
+            nrgXnrgHist2D_tl.addVal(omega, photon.omega, photon.polarization);
+            nrgXthetaHist2D_tl.addVal(omega, photon.theta, photon.polarization);
+            thetaXnrgHist2D_tl.addVal(theta, photon.omega, photon.polarization);
+            thetaXthetaHist2D_tl.addVal(theta, photon.theta, photon.polarization);
+
+            finalValsHist2D_tl.addVal(photon.omega, photon.theta, photon.polarization);
         }
-
-        PhotonState photon{omega, theta, 0, thisPol}; 
-
-        // Initialize histograms we want on a per-scatter basis
-        Histogram localNRGHist{Nbins, lowerOmega, upperOmega};
-        Histogram localThetaHist{Nbins, 0, M_PI};
-        Histogram localBetaHist{Nbins, -1, 1};
-
-        bool escaped = false; 
-        double beta = 0;
-
-        while(!escaped)
-        {
-            beta = performScatter(photon, recoil);
-
-            // Add values to histograms
-            localNRGHist.addVal(photon.omega, photon.polarization);
-            localThetaHist.addVal(photon.theta, photon.polarization);
-            localBetaHist.addVal(beta, photon.polarization);
-
-            escaped = hasEscaped(photon);
-        }
-
-        // Once escaped, add results to averages
-        avgOmega += photon.omega;
-        avgTheta += photon.theta;
-        avgNum += photon.numScatterings;
-        avgPol += photon.polarization;
-
+        
+        // Once all particles are done, combine with global hists
         #pragma omp critical // Needs to be in critical block to avoid race conditions
         {
             // Combine data for per-scatter hists
-            everyNRGHist.combineData(localNRGHist);
-            everyThetaHist.combineData(localThetaHist);
-            everyBetaHist.combineData(localBetaHist);
+            everyNRGHist_in.combineData(everyNRGHist_tl);
+            everyThetaHist_in.combineData(everyThetaHist_tl);
+            everyBetaHist_in.combineData(everyBetaHist_tl);
 
-            // Add data for on-escape hists
-            finalNRGHist.addVal(photon.omega, photon.polarization);
-            finalThetaHist.addVal(photon.theta, photon.polarization);
-            finalCountHist.addVal(photon.numScatterings, photon.polarization);
+            // Combine data for final value hists
+            finalNRGHist_in.combineData(finalNRGHist_tl);
+            finalThetaHist_in.combineData(finalThetaHist_tl);
+            finalCountHist_in.combineData(finalCountHist_tl);
 
-            nrgXnrgHist2D.addVal(omega, photon.omega, photon.polarization);
-            nrgXthetaHist2D.addVal(omega, photon.theta, photon.polarization);
-            thetaXnrgHist2D.addVal(theta, photon.omega, photon.polarization);
-            thetaXthetaHist2D.addVal(theta, photon.theta, photon.polarization);
+            nrgXnrgHist2D_in.combineData(nrgXnrgHist2D_tl);
+            nrgXthetaHist2D_in.combineData(nrgXthetaHist2D_tl);
+            thetaXnrgHist2D_in.combineData(thetaXnrgHist2D_tl);
+            thetaXthetaHist2D_in.combineData(thetaXthetaHist2D_tl);
 
-            finalValsHist2D.addVal(photon.omega, photon.theta, photon.polarization);
+            finalValsHist2D_in.combineData(finalValsHist2D_tl);
         }
     }
-
+    
     // Calculate averages
     avgOmega /= Nparticles;
     avgTheta /= Nparticles;
