@@ -26,9 +26,15 @@ import postProcLib
 # Ncores will change
 
 # %%
-testRuns = ["mac_1thread", "mac_4thread", "mac_8thread", "mac_16thread", 
-            "win_1thread", "win_4thread", "win_8thread", "win_16thread", 
-            "win_1thread_local", "win_4thread_local", "win_8thread_local", "win_16thread_local"]
+mac_runs = [f"mac_{num}thread" for num in [1,4,8,16]]
+win_runs = [f"win_{num}thread" for num in [1,4,8,16]]
+mac_local_runs = [f"mac_{num}thread_local" for num in [1,4,8,16]]
+win_local_runs = [f"win_{num}thread_local" for num in [1,4,8,16]]
+mac_hists_runs = [f"mac_{num}thread_hists" for num in [1,4,8,16]]
+mac_long_runs = [f"mac_{num}thread_longrun" for num in [1,2,8]]
+
+# testRuns = mac_runs + win_runs + mac_local_runs + win_local_runs
+testRuns = mac_runs + mac_local_runs + mac_hists_runs + mac_long_runs
 
 data = []
 
@@ -100,14 +106,14 @@ def plotTimingData(key, i, ax):
     theseScatterPoints = []
 
     for j, testRun in enumerate(testRuns):
-        timing = np.sum(data[j*4 + i]["data"]["avgData"]["timings"]/1e6) # / (data[j*4 + i]["params"]["Nparticles"] * data[j*4 + i]["params"]["Nbins"]**2)
+        timing = np.sum(data[j*4 + i]["data"]["avgData"]["timings"]/1e6) / (data[j*4 + i]["params"]["Nparticles"] * data[j*4 + i]["params"]["Nbins"]**2)
 
         theseScatterPoints.append(timing)
 
     ax.bar(testRuns, theseScatterPoints)
 
     if (i == 0):
-        ax.set_ylabel("Time (sec)")
+        ax.set_ylabel("Average time per particle(sec)")
     
     plt.setp(ax.get_xticklabels(), rotation=30, ha='right')
 
