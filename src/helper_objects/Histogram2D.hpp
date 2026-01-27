@@ -32,6 +32,8 @@ class Histogram2D
 
         void addVal(double xValue, double yValue, int pol);
 
+        void combineData(Histogram2D& otherHist);
+
         void overrideVal(double xValue, double yValue, int pol, int val);
 
         void exportToFile(const std::string& name, const std::string& folder = "None");

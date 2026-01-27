@@ -3,6 +3,7 @@
 #include <cmath>
 #include <string>
 #include <fstream>
+#include <iostream>
 
 Histogram2D::Histogram2D(int inNumBinsX, int inNumBinsY, double inMinX, double inMaxX, double inMinY, double inMaxY, 
     bool logBinsX, bool logBinsY)
@@ -123,6 +124,25 @@ void Histogram2D::addVal(double xValue, double yValue, int pol)
     
     // If we get to the end and haven't found it, add one to the ticker
     outOfBoundsCount += 1;
+}
+
+
+void Histogram2D::combineData(Histogram2D& otherHist)
+{
+    // Combine count data from other histogram
+    // Assumes all values are the same!! We don't stop if they aren't but we do flag it
+    if ((numBinsX != otherHist.numBinsX) || (minValX != otherHist.minValX) || (maxValX != otherHist.maxValX) ||
+        (numBinsY != otherHist.numBinsY) || (minValY != otherHist.minValY) || (maxValY != otherHist.maxValY))
+    {
+        std::cout << "Incompatible histograms!";
+    }
+
+    // Simply loop over count arrays and add them together
+    for (int i = 0; i < numBinsX * numBinsY; i++)
+    {
+        counts_par[i] += otherHist.counts_par[i];
+        counts_perp[i] += otherHist.counts_perp[i];
+    }
 }
 
 
