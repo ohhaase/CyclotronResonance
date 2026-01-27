@@ -142,7 +142,7 @@ void Histogram::combineData(Histogram& otherHist)
     // Assumes all values are the same!! We don't stop if they aren't but we do flag it
     if ((numBins != otherHist.numBins) || (minVal != otherHist.minVal) || (maxVal != otherHist.maxVal))
     {
-        std::cout << "Incompatible histograms!";
+        std::cout << "Incompatible histograms! minVal: " << minVal << " maxVal: " << maxVal;
     }
 
     // Simply loop over count arrays and add them together

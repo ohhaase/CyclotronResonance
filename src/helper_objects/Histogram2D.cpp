@@ -134,7 +134,7 @@ void Histogram2D::combineData(Histogram2D& otherHist)
     if ((numBinsX != otherHist.numBinsX) || (minValX != otherHist.minValX) || (maxValX != otherHist.maxValX) ||
         (numBinsY != otherHist.numBinsY) || (minValY != otherHist.minValY) || (maxValY != otherHist.maxValY))
     {
-        std::cout << "Incompatible histograms!";
+        std::cout << "Incompatible 2D histograms! maxValX: " << maxValX << " maxValY: " << maxValY;
     }
 
     // Simply loop over count arrays and add them together
