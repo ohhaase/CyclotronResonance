@@ -1,7 +1,7 @@
 #include "helper_functions.hpp"
 
 #include <random>
-#include "../../include/pcg_random.hpp"
+#include "pcg_random.hpp"
 
 
 double getRandom(double min, double max) 
