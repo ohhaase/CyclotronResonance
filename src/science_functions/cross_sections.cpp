@@ -3,38 +3,26 @@
 #include "../global_vars.hpp"
 #include <cmath>
 
-extern const double SigmaBMax = 1.0 + 2.0*wB*wB*(1.0 / (Gamma*Gamma) - 5.0 / (16.0 * wB*wB + Gamma*Gamma));
+extern const double SigmaBMax = 2.0 * wB * wB / (Gamma * Gamma);
 double SigmaB(double w)
 {
-    double A = w*w + wB*wB;
-    double B = w*w - wB*wB - 0.25*Gamma*Gamma;
+    double wPlus = w + wB;
+    double wMinus = w - wB;
 
-    return w*w * A / (B*B + Gamma*Gamma*w*w);
-}
-
-
-double specialArg(double w, double sign1, double sign2)
-{
-    // Arg of z = x + iy for a special number we need
-    double denom = 4.0*wB*wB + Gamma*Gamma;
-
-    double x = 1.0 + 4.0*wB*w*sign1 / denom;
-    double y = -2.0*Gamma*w*sign1*sign2 / denom;
-
-    return atan2(y, x);
+    return 0.5 * w*w * (1.0 / (wMinus*wMinus + 0.25*Gamma*Gamma) + 1.0 / (wPlus * wPlus));
 }
 
 
 double cumSigmaB(double w)
 {
-    double argPosPos = specialArg(w, 1, 1);
-    double argPosNeg = specialArg(w, 1, -1);
-    double argNegPos = specialArg(w, -1, 1);
-    double argNegNeg = specialArg(w, -1, -1);
+    double wPlus = wB + w;
+    double wMinus = wB - w;
 
-    return 1.0/(32.0 * wB * Gamma) * (32*wB*Gamma*w + 
-                                     (16*wB*wB*wB - 6*wB*Gamma*Gamma)*(argPosNeg + argNegPos - argPosPos - argNegNeg) + 
-                                     (16*wB*wB*Gamma - Gamma*Gamma*Gamma)*(log(Gamma*Gamma + 4*(wB - w)*(wB - w)) - log(Gamma*Gamma + 4*(wB + w)*(wB + w))));
+    double A = (Gamma * Gamma - 4 * wB * wB) / (4 * Gamma);
+    double B = A * (atan(2.0 * wMinus / Gamma) - atan(2.0 * wPlus / Gamma));
+    double C = 0.5 * wB * log((Gamma*Gamma + 4*wMinus*wMinus) / (Gamma*Gamma + 4*wPlus*wPlus));
+
+    return w + B + C;
 }
 double cumSigBMin = cumSigmaB(lowerOmega);
 double cumSigBMax = cumSigmaB(upperOmega);

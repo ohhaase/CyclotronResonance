@@ -32,9 +32,10 @@ mac_local_runs = [f"mac_{num}thread_local" for num in [1,4,8,16]]
 win_local_runs = [f"win_{num}thread_local" for num in [1,4,8,16]]
 mac_hists_runs = [f"mac_{num}thread_hists" for num in [1,4,8,16]]
 mac_long_runs = [f"mac_{num}thread_longrun" for num in [1,2,8,16]] # Note: 16 thread run undoes the histogram changes
+new_sigb_runs = ["newSigB"]
 
-# testRuns = mac_runs + win_runs + mac_local_runs + win_local_runs
-testRuns = mac_runs + mac_local_runs + mac_hists_runs + mac_long_runs
+testRuns = mac_runs + win_runs + mac_local_runs + win_local_runs + new_sigb_runs
+# testRuns = mac_runs + mac_local_runs + mac_hists_runs + mac_long_runs
 
 data = []
 
