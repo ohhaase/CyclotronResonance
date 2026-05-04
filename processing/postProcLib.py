@@ -5,7 +5,11 @@ import os
 
 # Function for importing raw data from csv file
 def importData(filePath):
-    return np.genfromtxt(filePath, delimiter=',')
+    dirpath = os.path.dirname(__file__)
+
+    trueFilePath = os.path.join(dirpath, filePath)
+
+    return np.genfromtxt(trueFilePath, delimiter=',')
 
 # Functions to import the different sim outputs
 def importAverages(runFilePath, simParams):
@@ -20,7 +24,7 @@ def importAverages(runFilePath, simParams):
     avgNum = np.reshape(rawdata[:, 4], [Nbins, Nbins])
     avgPol = np.reshape(rawdata[:, 5], [Nbins, Nbins])
 
-    if np.shape(rawdata)[1] > 5:
+    if np.shape(rawdata)[1] > 6:
         binTimings = np.reshape(rawdata[:, 6], [Nbins, Nbins])
     else:
         binTimings = np.zeros_like(omegas)
@@ -261,5 +265,6 @@ def titleFromFolder(folder):
 
 def test():
     print(os.getcwd())
+    print(os.path.dirname(__file__))
 
 myMap = 'inferno'

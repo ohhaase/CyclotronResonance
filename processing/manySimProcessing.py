@@ -22,7 +22,7 @@ from scipy.optimize import curve_fit
 from scipy.special import voigt_profile
 
 # %%
-date = "testrun_012126"
+date = "newSigB"
 
 print("hello")
 
