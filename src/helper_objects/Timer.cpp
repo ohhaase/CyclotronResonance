@@ -52,3 +52,9 @@ double Timer::elapsedSec()
 
     return dT.count();
 }
+
+
+void Timer::reset()
+{
+    startTime = std::chrono::high_resolution_clock::now();
+}

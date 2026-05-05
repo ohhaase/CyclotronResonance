@@ -20,4 +20,6 @@ class Timer
         double elapsedMilli();
 
         double elapsedSec();
+
+        void reset();
 };
