@@ -146,7 +146,7 @@ void simType4()
     // Loop over electron temeperatures
     for (int i = 0; i < 2; i++)
     {
-        electronDistb.updateTheta(Thetas[i]);
+        electronDistb.updateTemp(Thetas[i]);
 
         // Loop over recoil
         for (int j = 0; j < 2; j++)
@@ -243,7 +243,7 @@ void simType5()
     // Loop over electron temeperatures
     for (int i = 0; i < 2; i++)
     {
-        electronDistb.updateTheta(Thetas[i]);
+        electronDistb.updateTemp(Thetas[i]);
 
         // Loop over recoil
         for (int j = 0; j < 2; j++)
@@ -314,7 +314,7 @@ void simType6()
     // Loop over electron temeperatures
     for (int i = 0; i < 4; i++)
     {
-        electronDistb.updateTheta(Thetas[i]);
+        electronDistb.updateTemp(Thetas[i]);
 
         // Unique folder
         std::string folderName = std::to_string(i);

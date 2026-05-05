@@ -4,7 +4,7 @@ class ElectronDistb
 {
     private:
         double (ElectronDistb::*distbFunc)(double);
-        double Theta;
+        double T;
 
         // Maxwell boltzmann
         double MBdistb(double beta);
@@ -19,7 +19,7 @@ class ElectronDistb
 
         ~ElectronDistb();
 
-        void updateTheta(double inTheta);
+        void updateTemp(double inTheta);
 
         double operator () (double beta);
 
@@ -27,6 +27,3 @@ class ElectronDistb
 
         void setDistb(int distbNum);
 };
-
-// Global instance
-extern ElectronDistb electronDistb;

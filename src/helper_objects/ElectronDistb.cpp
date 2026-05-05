@@ -2,16 +2,12 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include "../global_vars.hpp"
-
-// Global instance
-ElectronDistb electronDistb(Theta);
 
 
 // Maxwell boltzmann
 double ElectronDistb::MBdistb(double beta)
 {
-    return sqrt(1.0 / (2 * M_PI * Theta)) * exp(-beta*beta / (2.0 * Theta));
+    return sqrt(1.0 / (2 * M_PI * T)) * exp(-beta*beta / (2.0 * T));
 }
 
 
@@ -21,7 +17,7 @@ double ElectronDistb::MJdistb(double beta)
     double gamma = 1.0 / sqrt(1.0 - beta*beta);
 
     // Uses modified bessel function of 2nd kind
-    return (exp(-gamma / Theta) * gamma*gamma*gamma) / (2.0 * K1);
+    return (exp(-gamma / T) * gamma*gamma*gamma) / (2.0 * K1);
 }
 
 
@@ -31,8 +27,8 @@ ElectronDistb::ElectronDistb(double inTheta)
     distbFunc = &ElectronDistb::MJdistb;
     // distbFunc = &ElectronDistb::MBdistb;
 
-    Theta = inTheta;
-    K1 = std::cyl_bessel_k(1.0, 1.0 / Theta); 
+    T = inTheta;
+    K1 = std::cyl_bessel_k(1.0, 1.0 / T); 
 }
 
 
@@ -42,10 +38,10 @@ ElectronDistb::~ElectronDistb()
 }
 
 
-void ElectronDistb::updateTheta(double inTheta)
+void ElectronDistb::updateTemp(double inT)
 {
-    Theta = inTheta;
-    K1 = std::cyl_bessel_k(1.0, 1.0 / Theta);
+    T = inT;
+    K1 = std::cyl_bessel_k(1.0, 1.0 / T);
 }
 
 

@@ -2,7 +2,6 @@
 
 #include "../global_vars.hpp"
 #include <cmath>
-#include "../helper_objects/ElectronDistb.hpp"
 #include "../core/helper_functions.hpp"
 
 // ===== Beta calculations =====

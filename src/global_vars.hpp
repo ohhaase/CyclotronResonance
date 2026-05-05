@@ -1,5 +1,7 @@
 #pragma once
 
+#include "helper_objects/ElectronDistb.hpp"
+
 // ===== Simulation Parameters =====
 extern const double SigmaBMin;
 extern double Theta; // Dimensionless temp: kb * T / mc^2
@@ -8,6 +10,8 @@ extern const int maxNum; // Max number of scatters
 
 extern const double finalNRGlow;
 extern const double finalNRGhigh;
+
+extern ElectronDistb electronDistb;
 
 // ===== Constants =====
 extern const double alphaf;

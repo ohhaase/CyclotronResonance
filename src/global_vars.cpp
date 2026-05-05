@@ -1,17 +1,19 @@
 #include "global_vars.hpp"
 
+#include "helper_objects/ElectronDistb.hpp"
 #include <cmath>
 
 // consts need to be set as extern as well
 
 // ===== Simulation Parameters =====
 extern const double SigmaBMin = 10;
-double Theta = 0.05; // Dimensionless temp: kb * T / mc^2
 extern const double wB = 0.1;
 extern const int maxNum = 200; // Max number of scatters
 
 extern const double finalNRGlow = 0.04;
 extern const double finalNRGhigh = 0.2;
+
+ElectronDistb electronDistb(0.05); // Default T = 0.05
 
 // ===== Constants =====
 extern const double alphaf = 1.0/137.0;
