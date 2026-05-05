@@ -5,3 +5,5 @@
 double getRandom(double min, double max);
 
 void loadingBar(int Nbins, int i, int j);
+
+char* getDateTime();

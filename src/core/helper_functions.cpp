@@ -1,6 +1,8 @@
 #include "helper_functions.hpp"
 
 #include <random>
+#include <ctime>
+
 #include "pcg/pcg_random.hpp"
 
 
@@ -19,6 +21,7 @@ double getRandom(double min, double max)
     return (max - min) * distrib(rng) + min;
 }
 
+
 void loadingBar(int Nbins, int i, int j)
 {
     int totalBins = Nbins*Nbins;
@@ -26,4 +29,13 @@ void loadingBar(int Nbins, int i, int j)
     int binNum = i*Nbins + j;
 
     std::cout << "Finished " << binNum << "/" << totalBins << "\r";
+}
+
+
+char* getDateTime()
+{
+    time_t timestamp;
+    time(&timestamp);
+
+    return ctime(&timestamp);
 }
