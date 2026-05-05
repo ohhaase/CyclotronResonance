@@ -1,5 +1,9 @@
 #pragma once
 
+// ===== Helpers =====
+void saveSimInfo();
+void exportSimInfo();
+
 // ===== Sim functions =====
 void simType1();
 void simType2();

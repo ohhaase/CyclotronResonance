@@ -1,16 +1,56 @@
 #include "sim_types.hpp"
 
-#include "../global_vars.hpp"
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <ctime>
+
+#include "nlohmann/json.hpp"
+
+#include "../global_vars.hpp"
 #include "../helper_objects/Timer.hpp"
 #include "parallel_functions.hpp"
 #include "helper_functions.hpp"
 #include "../helper_objects/ElectronDistb.hpp"
 
-#define _USE_MATH_DEFINES
-#include <cmath>
+
+// ===== Helpers =====
+nlohmann::json simInfo;
+Timer simTimer;
+
+void saveSimInfo()
+{
+    simTimer.reset();
+
+    simInfo = {
+        {"StartTime", getDateTime()},
+        {"RunTime", 0.0}, // Temp value, will change when we write to it
+        {"NBins", Nbins},
+        {"NParticles", Nparticles},
+        {"NThreads", Nthreads},
+        {"Recoil", true},
+        {"FieldStrength", B},
+        {"ElectronDistb", electronDistb.distb},
+        {"ElectronTemp", electronDistb.T},
+        {"NRGLims", SigmaBMin}
+    };
+}
+
+
+void exportSimInfo()
+{
+    simInfo["RunTime"] = simTimer.elapsedSec();
+
+    std::string fileName = simFolder + "/simInfo.json";
+
+    std::ofstream simInfoFile(fileName);
+
+    simInfoFile << std::setw(3) << simInfo << std::endl;
+
+    simInfoFile.close();
+}
 
 
 // ===== Sim functions =====

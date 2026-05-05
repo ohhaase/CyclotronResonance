@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "helper_objects/ElectronDistb.hpp"
 
 // ===== Simulation Parameters =====
@@ -26,6 +27,8 @@ extern int Nbins;
 extern int simType;
 extern int Nparticles;
 extern int Nthreads;
+
+extern std::string simFolder;
 
 // ===== Cross section type-defs =====
 typedef double(*diffCrossSecFunc)(double, double, double); 

@@ -25,7 +25,10 @@ ElectronDistb::ElectronDistb(double inTheta)
 {
     // Selects MJ by default
     distbFunc = &ElectronDistb::MJdistb;
+    distb = "MJ";
+
     // distbFunc = &ElectronDistb::MBdistb;
+    // distb = "MB";
 
     T = inTheta;
     K1 = std::cyl_bessel_k(1.0, 1.0 / T); 
@@ -65,11 +68,13 @@ void ElectronDistb::setDistb(int distbNum)
     {
         case 0: // MB
         {
+            distb = "MB";
             distbFunc = &ElectronDistb::MBdistb;
             break;
         }
         case 1: // MJ
         {
+            distb = "MJ";
             distbFunc = &ElectronDistb::MJdistb;
             break;
         }

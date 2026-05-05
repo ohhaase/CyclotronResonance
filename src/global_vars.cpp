@@ -29,3 +29,4 @@ int simType;
 int Nparticles;
 int Nthreads;
 
+std::string simFolder = "simData";
