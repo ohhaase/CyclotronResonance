@@ -1,7 +1,7 @@
 #pragma once
 
 // ===== Helpers =====
-void saveSimInfo();
+void storeSimInfo();
 void exportSimInfo();
 
 // ===== Sim functions =====

@@ -19,13 +19,6 @@ int main(int argc, char** argv)
         simType = std::atoi(argv[3]);
         Nthreads = std::atoi(argv[4]);
     }
-    
-    std::ofstream simParams("simParams.csv");
-
-    // Write simulation data to file
-    simParams << Nparticles << "," << Nbins << "," << simType;
-
-    simParams.close();
 
     switch (simType)
     {

@@ -20,7 +20,7 @@
 nlohmann::json simInfo;
 Timer simTimer;
 
-void saveSimInfo()
+void storeSimInfo()
 {
     simTimer.reset();
 
@@ -56,7 +56,10 @@ void exportSimInfo()
 // ===== Sim functions =====
 void simType1()
 {
-    std::ofstream outputFile("outdata.csv");
+    storeSimInfo();
+
+    std::filesystem::create_directory(simFolder);
+    std::ofstream outputFile(simFolder + "/" + "outdata.csv");
 
     Timer totalTime;
 
@@ -84,6 +87,8 @@ void simType1()
     
     outputFile.close();
 
+    exportSimInfo();
+
     std::cout << "Simulation completed in: " << totalTime.elapsedSec() << " seconds\n";
 
     system("py dataprocessing.py");
@@ -91,6 +96,8 @@ void simType1()
 
 void simType2()
 {
+    storeSimInfo();
+
     // Do we still want to do this looping over the bins?
     // Initialize histograms
     Histogram globalNRGHist{Nbins, lowerOmega, upperOmega};
@@ -115,14 +122,20 @@ void simType2()
     }
     
     // Write histograms to file
-    globalNRGHist.exportToFile("energy");
-    globalBetaHist.exportToFile("beta");
+    std::filesystem::create_directory(simFolder);
+
+    globalNRGHist.exportToFile("energy", simFolder);
+    globalBetaHist.exportToFile("beta", simFolder);
+
+    exportSimInfo();
 
     system("py dataprocessing.py");
 }
 
 void simType3()
 {
+    storeSimInfo();
+
     // A third sim type to pretty much just time things
     // Will just output timing data:
     // Total sim time (ms)
@@ -165,7 +178,10 @@ void simType3()
     // std::cout << "Sim finished with [Nparticles, Nbins, Nthreads, Time elapsed (s), Average bin time (ms)] =\n";
     std::cout << Nparticles << "," << Nbins << "," << Nthreads << "," << simTime.elapsedSec() << "," << avgBinTime << "\n";
 
-    binTimings.exportToFile("binTimings");
+    std::filesystem::create_directory(simFolder);
+    binTimings.exportToFile("binTimings", simFolder);
+
+    exportSimInfo();
 }
 
 
@@ -191,13 +207,14 @@ void simType4()
         // Loop over recoil
         for (int j = 0; j < 2; j++)
         {
-            // Unique folder
-            std::string folderName = std::to_string(i) + std::to_string(j);
+            simInfo["Recoil"] = (bool)recoils[j];
 
-            std::filesystem::create_directory(folderName);
+            // Unique folder
+            simFolder = "simData" + std::to_string(j + i*2);
+            std::filesystem::create_directory(simFolder);
 
             // Initialize output file for average data
-            std::ofstream outputFile(folderName + "/" + "avgdata.csv");
+            std::ofstream outputFile(simFolder + "/" + "avgdata.csv");
 
             // Initialize histograms
             Histogram everyNRGHist{Nbins, lowerOmega, upperOmega};
@@ -247,20 +264,22 @@ void simType4()
             outputFile.close();
 
             // Export histograms
-            everyNRGHist.exportToFile("nrg", folderName);
-            everyThetaHist.exportToFile("theta", folderName);
-            everyBetaHist.exportToFile("beta", folderName);
+            everyNRGHist.exportToFile("nrg", simFolder);
+            everyThetaHist.exportToFile("theta", simFolder);
+            everyBetaHist.exportToFile("beta", simFolder);
 
-            finalNRGHist.exportToFile("esc_nrg", folderName);
-            finalThetaHist.exportToFile("esc_theta", folderName);
-            finalCountHist.exportToFile("num", folderName);
+            finalNRGHist.exportToFile("esc_nrg", simFolder);
+            finalThetaHist.exportToFile("esc_theta", simFolder);
+            finalCountHist.exportToFile("num", simFolder);
 
-            nrgXnrgHist2D.exportToFile("nrgXnrg", folderName);
-            nrgXthetaHist2D.exportToFile("nrgXtheta", folderName);
-            thetaXnrgHist2D.exportToFile("thetaXnrg", folderName);
-            thetaXthetaHist2D.exportToFile("thetaXtheta", folderName);
+            nrgXnrgHist2D.exportToFile("nrgXnrg", simFolder);
+            nrgXthetaHist2D.exportToFile("nrgXtheta", simFolder);
+            thetaXnrgHist2D.exportToFile("thetaXnrg", simFolder);
+            thetaXthetaHist2D.exportToFile("thetaXtheta", simFolder);
 
-            finalValsHist2D.exportToFile("finalVals", folderName);
+            finalValsHist2D.exportToFile("finalVals", simFolder);
+
+            exportSimInfo();
         }
     }
 }
@@ -288,10 +307,14 @@ void simType5()
         // Loop over recoil
         for (int j = 0; j < 2; j++)
         {
-            // Unique folder
-            std::string folderName = std::to_string(i) + std::to_string(j);
+            simInfo["Recoil"] = (bool)recoils[j];
 
-            std::filesystem::create_directory(folderName);
+            // Unique folder
+            simFolder = "simData" + std::to_string(j + i*2);
+            std::filesystem::create_directory(simFolder);
+
+            // Initialize output file for average data
+            std::ofstream outputFile(simFolder + "/" + "avgdata.csv");
 
             // Initialize histograms
             Histogram everyNRGHist{Nbins, lowerOmega, upperOmega};
@@ -321,20 +344,22 @@ void simType5()
                 nrgXnrgHist2D, thetaXnrgHist2D, nrgXthetaHist2D, thetaXthetaHist2D, finalValsHist2D);
 
             // Export histograms
-            everyNRGHist.exportToFile("nrg", folderName);
-            everyThetaHist.exportToFile("theta", folderName);
-            everyBetaHist.exportToFile("beta", folderName);
+            everyNRGHist.exportToFile("nrg", simFolder);
+            everyThetaHist.exportToFile("theta", simFolder);
+            everyBetaHist.exportToFile("beta", simFolder);
 
-            finalNRGHist.exportToFile("esc_nrg", folderName);
-            finalThetaHist.exportToFile("esc_theta", folderName);
-            finalCountHist.exportToFile("num", folderName);
+            finalNRGHist.exportToFile("esc_nrg", simFolder);
+            finalThetaHist.exportToFile("esc_theta", simFolder);
+            finalCountHist.exportToFile("num", simFolder);
 
-            nrgXnrgHist2D.exportToFile("nrgXnrg", folderName);
-            nrgXthetaHist2D.exportToFile("nrgXtheta", folderName);
-            thetaXnrgHist2D.exportToFile("thetaXnrg", folderName);
-            thetaXthetaHist2D.exportToFile("thetaXtheta", folderName);
+            nrgXnrgHist2D.exportToFile("nrgXnrg", simFolder);
+            nrgXthetaHist2D.exportToFile("nrgXtheta", simFolder);
+            thetaXnrgHist2D.exportToFile("thetaXnrg", simFolder);
+            thetaXthetaHist2D.exportToFile("thetaXtheta", simFolder);
 
-            finalValsHist2D.exportToFile("finalVals", folderName);
+            finalValsHist2D.exportToFile("finalVals", simFolder);
+
+            exportSimInfo();
         }
     }
 }
@@ -357,12 +382,11 @@ void simType6()
         electronDistb.updateTemp(Thetas[i]);
 
         // Unique folder
-        std::string folderName = std::to_string(i);
-
-        std::filesystem::create_directory(folderName);
+        simFolder = "simData" + std::to_string(i);
+        std::filesystem::create_directory(simFolder);
 
         // Initialize output file for average data
-        std::ofstream outputFile(folderName + "/" + "avgdata.csv");
+        std::ofstream outputFile(simFolder + "/" + "avgdata.csv");
 
         // Initialize histograms
         Histogram everyNRGHist{Nbins, lowerOmega, upperOmega};
@@ -408,19 +432,21 @@ void simType6()
         outputFile.close();
 
         // Export histograms
-        everyNRGHist.exportToFile("nrg", folderName);
-        everyThetaHist.exportToFile("theta", folderName);
-        everyBetaHist.exportToFile("beta", folderName);
+        everyNRGHist.exportToFile("nrg", simFolder);
+        everyThetaHist.exportToFile("theta", simFolder);
+        everyBetaHist.exportToFile("beta", simFolder);
 
-        finalNRGHist.exportToFile("esc_nrg", folderName);
-        finalThetaHist.exportToFile("esc_theta", folderName);
-        finalCountHist.exportToFile("num", folderName);
+        finalNRGHist.exportToFile("esc_nrg", simFolder);
+        finalThetaHist.exportToFile("esc_theta", simFolder);
+        finalCountHist.exportToFile("num", simFolder);
 
-        nrgXnrgHist2D.exportToFile("nrgXnrg", folderName);
-        nrgXthetaHist2D.exportToFile("nrgXtheta", folderName);
-        thetaXnrgHist2D.exportToFile("thetaXnrg", folderName);
-        thetaXthetaHist2D.exportToFile("thetaXtheta", folderName);
+        nrgXnrgHist2D.exportToFile("nrgXnrg", simFolder);
+        nrgXthetaHist2D.exportToFile("nrgXtheta", simFolder);
+        thetaXnrgHist2D.exportToFile("thetaXnrg", simFolder);
+        thetaXthetaHist2D.exportToFile("thetaXtheta", simFolder);
 
-        finalValsHist2D.exportToFile("finalVals", folderName);
+        finalValsHist2D.exportToFile("finalVals", simFolder);
+
+        exportSimInfo();
     }
 }
