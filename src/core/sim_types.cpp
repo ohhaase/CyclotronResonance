@@ -211,8 +211,8 @@ void simType4()
         // Loop over recoil
         for (int j = 0; j < 2; j++)
         {
-            simInfo["Recoil"] = (bool)recoils[j];
             storeSimInfo();
+            simInfo["Recoil"] = (bool)recoils[j];
 
             // Unique folder
             simFolder = "simData" + std::to_string(j + i*2);
