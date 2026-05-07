@@ -69,11 +69,18 @@ def importHistogram(runFilePath, name):
     parCountsData[parNegMask] = 2147483647 + (parCountsData[parNegMask] + 2147483647 + 2)
     perpCountsData[perpNegMask] = 2147483647 + (perpCountsData[perpNegMask] + 2147483647 + 2)
 
+    # Centers for normalization
+    centers = np.linspace(wallsData[0], wallsData[-1], wallsData.size-1)
+
     hist = {
         "walls": wallsData,
         "parCounts": parCountsData,
         "perpCounts": perpCountsData,
-        "totalCounts": parCountsData + perpCountsData
+        "totalCounts": parCountsData + perpCountsData,
+        "centers": centers,
+        "parNormalized": normalize1D(parCountsData, centers),
+        "perpNormalized": normalize1D(perpCountsData, centers),
+        "totalNormalized": normalize1D(parCountsData + perpCountsData, centers)
     }
 
     return hist
@@ -86,12 +93,21 @@ def importHistogram2D(runFilePath, name):
     parCountsData = rawData[1:-1, 1:-3:2]
     perpCountsData = rawData[1:-1, 2:-3:2]
 
+    # Centers for normalization
+    xVals = np.linspace(xWallsData[0], xWallsData[-1], xWallsData.size-1) 
+    yVals = np.linspace(yWallsData[0], yWallsData[-1], yWallsData.size-1)
+
     hist = {
         "xWalls": xWallsData,
         "yWalls": yWallsData,
         "parCounts": parCountsData,
         "perpCounts": perpCountsData,
-        "totalCounts": parCountsData + perpCountsData
+        "totalCounts": parCountsData + perpCountsData,
+        "xCenters": xVals,
+        "yCenters": yVals,
+        "parNormalized": normalize2D(parCountsData, xVals, yVals),
+        "perpNormalized": normalize2D(perpCountsData, xVals, yVals),
+        "totalNormalized": normalize2D(parCountsData + perpCountsData, xVals, yVals)
     }
 
     return hist
@@ -317,5 +333,13 @@ def test():
 
     print(filePath)
 
+
+# ==== Numerics helpers
+def normalize1D(vals, centers):
+    return vals/np.trapezoid(vals, centers)
+
+def normalize2D(vals, centersx, centersy):
+    intVal = np.trapezoid(np.trapezoid(vals, centersy, axis=0), centersx, axis=0)
+    return vals/intVal
 
 myMap = 'inferno'
