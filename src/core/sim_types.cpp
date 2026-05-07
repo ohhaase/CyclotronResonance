@@ -6,6 +6,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <ctime>
+#include <vector>
 
 #include "nlohmann/json.hpp"
 
@@ -189,18 +190,21 @@ void simType4()
 {
     // Outputs both average and histogram data
 
-    // Performs 4 simulations:
+    // Legacy version: performs 4 simulations:
     // Theta = 0.05, recoil on
     // Theta = 0.05, recoil off
     // Theta = 0.025, recoil on
     // Theta = 0.025, recoil off
 
-    double Thetas[2] = {0.05, 0.025};
-    // double Thetas[2] = {0.01, 0.005};
+    // New version: Performs as N * 2 sims, where:
+    // N is number of temps we want to study
+    // 2 because we look at recoil on/off for each
+
+    std::vector<double> Thetas = {0.05, 0.025, 0.01, 0.005};
     int recoils[2] = {0, 1}; 
 
     // Loop over electron temeperatures
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < Thetas.size(); i++)
     {
         electronDistb.updateTemp(Thetas[i]);
 
@@ -208,6 +212,7 @@ void simType4()
         for (int j = 0; j < 2; j++)
         {
             simInfo["Recoil"] = (bool)recoils[j];
+            storeSimInfo();
 
             // Unique folder
             simFolder = "simData" + std::to_string(j + i*2);
@@ -307,6 +312,7 @@ void simType5()
         // Loop over recoil
         for (int j = 0; j < 2; j++)
         {
+            storeSimInfo();
             simInfo["Recoil"] = (bool)recoils[j];
 
             // Unique folder
@@ -322,7 +328,7 @@ void simType5()
             Histogram everyThetaHist{Nbins, 0, M_PI};
             Histogram finalThetaHist{Nbins, 0, M_PI};
             Histogram everyBetaHist{Nbins, -1, 1};
-            Histogram finalCountHist{Nbins, 0, maxNum};
+            Histogram finalCountHist{Nbins, 1, maxNum};
 
             // Initialize 2D histogram vectors
             Histogram2D nrgXnrgHist2D{Nbins, Nbins, lowerOmega, upperOmega, finalNRGlow, finalNRGhigh, false, true};
@@ -380,6 +386,7 @@ void simType6()
     for (int i = 0; i < 4; i++)
     {
         electronDistb.updateTemp(Thetas[i]);
+        storeSimInfo();
 
         // Unique folder
         simFolder = "simData" + std::to_string(i);

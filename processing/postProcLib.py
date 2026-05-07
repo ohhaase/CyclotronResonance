@@ -2,7 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import os
+import json
 
+# ==== File and data imports ====
 # Function for importing raw data from csv file
 def importData(filePath):
     dirpath = os.path.dirname(__file__)
@@ -11,11 +13,22 @@ def importData(filePath):
 
     return np.genfromtxt(trueFilePath, delimiter=',')
 
+# Function for importing simInfo JSON file
+def importSimInfo(simPath):
+    dirpath = os.path.dirname(__file__)
+
+    filePath = os.path.join(dirpath, simPath, "simInfo.json")
+
+    with open(filePath) as jsonFile:
+        data = json.load(jsonFile)
+
+    return data
+
 # Functions to import the different sim outputs
 def importAverages(runFilePath, simParams):
-    rawdata = importData(f"{runFilePath}/avgdata.csv")
+    rawdata = importData(os.path.join(runFilePath, "avgdata.csv"))
 
-    Nbins = simParams["Nbins"]
+    Nbins = simParams["NBins"]
 
     omegas = np.reshape(rawdata[:, 0], [Nbins, Nbins])
     thetas = np.reshape(rawdata[:, 1], [Nbins, Nbins])
@@ -42,7 +55,7 @@ def importAverages(runFilePath, simParams):
     return avgData
 
 def importHistogram(runFilePath, name):
-    rawData = importData(f"{runFilePath}/hist_{name}.csv")
+    rawData = importData(os.path.join(runFilePath, f"hist_{name}.csv"))
 
     wallsData = rawData[0, :-1]
     parCountsData = rawData[1, :-2]
@@ -66,7 +79,7 @@ def importHistogram(runFilePath, name):
     return hist
 
 def importHistogram2D(runFilePath, name):
-    rawData = importData(f"{runFilePath}/hist2D_{name}.csv")
+    rawData = importData(os.path.join(runFilePath, f"hist2D_{name}.csv"))
 
     xWallsData = rawData[0, 1:-1:2]
     yWallsData = rawData[1:, 0]
@@ -120,7 +133,8 @@ def importAll2DHists(runFilePath):
 
     return histograms
 
-# Function to import a single run (within the 4-run runs)
+# ==== Sim imports ====
+# Function to import a single sim
 def importSubRunData(runFilePath, simParams):
     runData = {
         "avgData": importAverages(runFilePath, simParams),
@@ -130,6 +144,23 @@ def importSubRunData(runFilePath, simParams):
 
     return runData
 
+# Function to get a single run with the new json layout
+def importSim(simPath):
+    simLocation = os.path.join(os.pardir, "data", simPath)
+
+    simInfo = importSimInfo(simLocation)
+    simData = importSubRunData(simLocation, simInfo)
+
+    thisSim = {
+        "info": simInfo,
+        "data": simData,
+        "name": simPath
+    }
+    
+    return thisSim
+
+
+# ==== Run imports (multiple sims) ====
 # Function to get extra tags based on simulation type
 def tagsFromSubFolder(folder, quadRunName):
     Theta = 0
@@ -233,6 +264,19 @@ def importScatterNumData(scatterLim):
     
     return runs
 
+# Function to get all sims from a run (post json update)
+def importRun(runName, numSims):
+    sims = []
+
+    for i in range(numSims):
+        simPath = os.path.join(runName, f"simData{i}")
+
+        sims.append(importSim(simPath))
+
+    return sims
+
+
+# ==== Plot helpers ====
 def plotAllKeys(keys, plotFunc):
     # Loop over every key (diff for hists vs avg data)
     for key in keys:
@@ -266,5 +310,12 @@ def titleFromFolder(folder):
 def test():
     print(os.getcwd())
     print(os.path.dirname(__file__))
+
+    dirpath = os.path.dirname(__file__)
+
+    filePath = os.path.join(dirpath, "a/b", "simInfo.json")
+
+    print(filePath)
+
 
 myMap = 'inferno'
