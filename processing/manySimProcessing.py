@@ -24,8 +24,6 @@ from scipy.special import voigt_profile
 # %%
 date = "newSigB"
 
-print("hello")
-
 def importData(name):
     return np.genfromtxt(f"../data/{date}/{name}", delimiter=',')
 
@@ -265,7 +263,10 @@ def plotNormHistData(key, i, ax):
             ax.set_xscale('log')
             xVals = np.logspace(np.log10(xWalls[0]), np.log10(xWalls[-1]), xWalls.size-1)
         case "num":
-            ax.set_ylim([0, 0.12])
+            # ax.set_ylim([0.001, 0.12])
+            xVals = np.logspace(np.log10(xWalls[0]), np.log10(xWalls[-1]), xWalls.size-1)
+            ax.set_xscale('log')
+            ax.set_yscale('log')
 
     relCountList = []
 

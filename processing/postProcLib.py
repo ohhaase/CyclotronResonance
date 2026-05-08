@@ -70,7 +70,7 @@ def importHistogram(runFilePath, name):
     perpCountsData[perpNegMask] = 2147483647 + (perpCountsData[perpNegMask] + 2147483647 + 2)
 
     # Centers for normalization
-    centers = np.linspace(wallsData[0], wallsData[-1], wallsData.size-1)
+    centers = np.linspace((wallsData[0]+wallsData[1])/2, (wallsData[-2] + wallsData[-1])/2, wallsData.size-1) # Technically incorrect for log hists, but close enough
 
     hist = {
         "walls": wallsData,
@@ -94,8 +94,8 @@ def importHistogram2D(runFilePath, name):
     perpCountsData = rawData[1:-1, 2:-3:2]
 
     # Centers for normalization
-    xVals = np.linspace(xWallsData[0], xWallsData[-1], xWallsData.size-1) 
-    yVals = np.linspace(yWallsData[0], yWallsData[-1], yWallsData.size-1)
+    xVals = np.linspace((xWallsData[0]+xWallsData[1])/2, (xWallsData[-2] + xWallsData[-1])/2, xWallsData.size-1) # Technically incorrect for log hists, but close enough
+    yVals = np.linspace((yWallsData[0]+yWallsData[1])/2, (yWallsData[-2] + yWallsData[-1])/2, yWallsData.size-1) # Technically incorrect for log hists, but close enough
 
     hist = {
         "xWalls": xWallsData,
