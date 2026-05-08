@@ -149,6 +149,7 @@ def importAll2DHists(runFilePath):
 
     return histograms
 
+
 # ==== Sim imports ====
 # Function to import a single sim
 def importSubRunData(runFilePath, simParams):
@@ -323,6 +324,130 @@ def titleFromFolder(folder):
 
     return rf"{recoil}, $\Theta=$ {Theta}"
 
+def recoilComparisonPlot(data, key, plotValFunc):
+    # Plot for a variable vs temps
+
+    xLabel = "variable"
+    yLabel = "Relative Counts"
+    xScale = "linear"
+    yScale = "linear"
+
+    match key:
+        case "num":
+            xLabel = r"Scatter Num"
+            xScale = yScale = "log"
+        case "nrg" | "esc_nrg":
+            xLabel = r"$\omega$"
+            xScale = "log"
+        case "theta":
+            xLabel = r"$\cos{\Theta}$"
+        case "esc_theta":
+            xLabel = r"$\Theta$"
+
+    fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+
+    for i, ax in enumerate(axes):
+        if (i == 0):
+            recoil = "No Recoil"
+            recoilBool = False
+        else:
+            recoil = "Recoil"
+            recoilBool = True
+
+        legendTitles = []
+        for run in data:
+
+            if (run["info"]["Recoil"] == recoilBool):
+                # Get relevant numscatter hist data
+                thisHist = run["data"]["hists"][key]
+
+                plotVals, xWalls, _ = plotValFunc(thisHist)
+
+                ax.stairs(plotVals, xWalls, fill=False)
+
+                legendTitles.append(run["info"]["ElectronTemp"])    
+
+        if (i == 0):
+            # ax.set_ylabel("Counts")
+            ax.set_ylabel(yLabel)
+        
+        
+        ax.set_xlabel(xLabel)
+
+        ax.set_box_aspect(1)
+
+        ax.set_xscale(xScale)
+        ax.set_yscale(yScale)
+
+        ax.legend(legendTitles, title=r"$\mathcal{T}=kT/mc^2$")
+
+        ax.set_title(recoil)
+
+def recoilComparisonDiffPlot(data, key, plotValFunc):
+    xLabel = "variable"
+    yLabel = "Relative Counts"
+    xScale = "linear"
+    yScale = "linear"
+
+    match key:
+        case "num":
+            xLabel = r"Scatter Num"
+            xScale = yScale = "log"
+        case "nrg" | "esc_nrg":
+            xLabel = r"$\omega$"
+            xScale = "log"
+        case "theta":
+            xLabel = r"$\cos{\Theta}$"
+        case "esc_theta":
+            xLabel = r"$\Theta$"
+
+    fig, axes = plt.subplots(1, 2, figsize=(11, 6))
+
+    for i, ax in enumerate(axes):
+        # Make subaxis for the differences
+        subax = ax.inset_axes([0, -0.3, 1, 0.25], sharex=ax)
+
+        subax.set_xlabel(xLabel)
+
+
+        if (i == 0):
+            recoil = "No Recoil"
+            recoilBool = False
+        else:
+            recoil = "Recoil"
+            recoilBool = True
+
+        legendTitles = []
+        for run in data:
+
+            if (run["info"]["Recoil"] == recoilBool):
+                # Get relevant numscatter hist data
+                thisHist = run["data"]["hists"][key]
+
+                plotVals, xWalls, diffs = plotValFunc(thisHist)
+
+                ax.stairs(plotVals, xWalls, fill=False)
+                subax.stairs(diffs, xWalls, fill=False, )
+
+                legendTitles.append(run["info"]["ElectronTemp"])    
+
+        subax.hlines(0, xWalls[0], xWalls[-1], "black", "--")
+
+        if (i == 0):
+            subax.set_ylabel(r"$\perp - \parallel$")
+            ax.set_ylabel(yLabel)
+        
+        ax.tick_params(axis="x", labelbottom=False)
+
+        ax.set_box_aspect(1)
+
+        ax.set_xscale(xScale)
+        ax.set_yscale(yScale)
+
+        ax.legend(legendTitles, title=r"$\mathcal{T}=kT/mc^2$")
+
+        ax.set_title(recoil)
+
 def test():
     print(os.getcwd())
     print(os.path.dirname(__file__))
@@ -334,7 +459,7 @@ def test():
     print(filePath)
 
 
-# ==== Numerics helpers
+# ==== Numerics helpers ====
 def normalize1D(vals, centers):
     return vals/np.trapezoid(vals, centers)
 

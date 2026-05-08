@@ -25,230 +25,63 @@ data = postProcLib.importRun("prodrun1", 8)
 # data = postProcLib.importRun("quicktests", 8)
 
 # %%
-# Plot for the scattering numbers vs temps
+def numPlotVals(thisHist):
+    # plotVals = thisHist["totalCounts"]
+    plotVals = thisHist["totalNormalized"]
 
-fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+    diffs = thisHist["perpNormalized"] - thisHist["parNormalized"]
 
-for i, ax in enumerate(axes):
-    if (i == 0):
-        recoil = "No Recoil"
-        recoilBool = False
-    else:
-        recoil = "Recoil"
-        recoilBool = True
+    xWalls = thisHist["walls"]
 
-    legendTitles = []
-    for run in data:
+    return plotVals, xWalls, diffs
 
-        if (run["info"]["Recoil"] == recoilBool):
-            # Get relevant numscatter hist data
-            thisHist = run["data"]["hists"]["num"]
+def muPlotVals(thisHist):
+    plotVals = thisHist["totalNormalized"]
+    plotVals = plotVals / np.sin(thisHist["centers"]) - 0.5
 
-            xWalls = thisHist["walls"]
-            
-            # plotVals = thisHist["totalCounts"]
-            plotVals = thisHist["totalNormalized"]
-            # plotVals = thisHist["perpNormalized"] - thisHist["parNormalized"]
+    diffs = thisHist["perpNormalized"] - thisHist["parNormalized"]
+    diffs = diffs / np.sin(thisHist["centers"])
 
-            ax.stairs(plotVals, xWalls, fill=False)
+    xWalls = np.cos(thisHist["walls"])
 
-            legendTitles.append(run["info"]["ElectronTemp"])    
+    return plotVals, xWalls, diffs
 
-    if (i == 0):
-        # ax.set_ylabel("Counts")
-        ax.set_ylabel("Relative Counts")
-    
-    
-    ax.set_xlabel(r"Scatter Num")
+def escThetaPlotVals(thisHist):
+    # plotVals = thisHist["totalCounts"]
+    plotVals = thisHist["totalNormalized"]
 
-    ax.set_box_aspect(1)
+    diffs = thisHist["perpNormalized"] - thisHist["parNormalized"]
 
-    ax.set_xscale('log')
-    ax.set_yscale('log')
+    xWalls = thisHist["walls"]
 
-    ax.legend(legendTitles, title=r"$\mathcal{T}=kT/mc^2$")
+    return plotVals, xWalls, diffs
 
-    ax.set_title(recoil)
+def nrgPlotVals(thisHist):
+    # plotVals = thisHist["totalCounts"]
+    plotVals = thisHist["totalNormalized"]
 
+    diffs = thisHist["perpNormalized"] - thisHist["parNormalized"]
 
-# %%
-# Plot for the mu histograms
+    xWalls = thisHist["walls"]
 
-fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+    return plotVals, xWalls, diffs
 
-for i, ax in enumerate(axes):
-    if (i == 0):
-        recoil = "No Recoil"
-        recoilBool = False
-    else:
-        recoil = "Recoil"
-        recoilBool = True
+def escNRGPlotVals(thisHist):
+    # plotVals = thisHist["totalCounts"]
+    plotVals = thisHist["totalNormalized"]
 
-    legendTitles = []
-    for run in data:
+    diffs = thisHist["perpNormalized"] - thisHist["parNormalized"]
 
-        if (run["info"]["Recoil"] == recoilBool):
-            # Get relevant numscatter hist data
-            thisHist = run["data"]["hists"]["theta"]
+    xWalls = thisHist["walls"]
 
-            plotVals = thisHist["totalNormalized"]
-            plotVals = plotVals / np.sin(thisHist["centers"]) - 0.5
+    return plotVals, xWalls, diffs
 
-            # plotVals = thisHist["perpNormalized"] - thisHist["parNormalized"]
-            # plotVals = plotVals / np.sin(thisHist["centers"])
+keys = ["num", "theta", "nrg", "esc_theta", "esc_nrg"]
+funcs = [numPlotVals, muPlotVals, nrgPlotVals, escThetaPlotVals, escNRGPlotVals]
 
-            wallVals = np.cos(thisHist["walls"])
-            
-            ax.stairs(plotVals, wallVals, fill=False)
-
-            legendTitles.append(run["info"]["ElectronTemp"])    
-
-    if (i == 0):
-        ax.set_ylabel("Relative Counts")
-    
-    
-    ax.set_xlabel(r"$\cos{\Theta}$")
-
-    ax.set_box_aspect(1)
-
-    # ax.set_xscale('log')
-    # ax.set_yscale('log')
-
-    ax.legend(legendTitles, title=r"$\mathcal{T}=kT/mc^2$")
-
-    ax.set_title(recoil)
-
-# %%
-# Plot for the scatter nrg histograms
-
-fig, axes = plt.subplots(1, 2, figsize=(11, 5))
-
-for i, ax in enumerate(axes):
-    if (i == 0):
-        recoil = "No Recoil"
-        recoilBool = False
-    else:
-        recoil = "Recoil"
-        recoilBool = True
-
-    legendTitles = []
-    for run in data:
-
-        if (run["info"]["Recoil"] == recoilBool):
-            # Get relevant numscatter hist data
-            thisHist = run["data"]["hists"]["nrg"]
-
-            wallVals = thisHist["walls"]
-            
-            plotVals = thisHist["totalNormalized"]
-            # plotVals = thisHist["perpNormalized"] - thisHist["parNormalized"]
-            
-            ax.stairs(plotVals, wallVals, fill=False)
-
-            legendTitles.append(run["info"]["ElectronTemp"])    
-
-    if (i == 0):
-        ax.set_ylabel("Relative Counts")
-    
-    
-    ax.set_xlabel(r"$\omega$")
-
-    ax.set_box_aspect(1)
-
-    # ax.set_xscale('log')
-    # ax.set_yscale('log')
-
-    ax.legend(legendTitles, title=r"$\mathcal{T}=kT/mc^2$")
-
-    ax.set_title(recoil)
-
-# %%
-# Plot for the scatter escape theta histograms
-
-fig, axes = plt.subplots(1, 2, figsize=(11, 5))
-
-for i, ax in enumerate(axes):
-    if (i == 0):
-        recoil = "No Recoil"
-        recoilBool = False
-    else:
-        recoil = "Recoil"
-        recoilBool = True
-
-    legendTitles = []
-    for run in data:
-
-        if (run["info"]["Recoil"] == recoilBool):
-            # Get relevant numscatter hist data
-            thisHist = run["data"]["hists"]["esc_theta"]
-
-            wallVals = thisHist["walls"]
-            
-            plotVals = thisHist["totalNormalized"]
-            # plotVals = thisHist["perpNormalized"] - thisHist["parNormalized"]
-            
-            ax.stairs(plotVals, wallVals, fill=False)
-
-            legendTitles.append(run["info"]["ElectronTemp"])    
-
-    if (i == 0):
-        ax.set_ylabel("Relative Counts")
-    
-    
-    ax.set_xlabel(r"$\Theta$")
-
-    ax.set_box_aspect(1)
-
-    # ax.set_xscale('log')
-    # ax.set_yscale('log')
-
-    ax.legend(legendTitles, title=r"$\mathcal{T}=kT/mc^2$")
-
-    ax.set_title(recoil)
-
-# %%
-# Plot for the escape nrg histograms
-
-fig, axes = plt.subplots(1, 2, figsize=(11, 5))
-
-for i, ax in enumerate(axes):
-    if (i == 0):
-        recoil = "No Recoil"
-        recoilBool = False
-    else:
-        recoil = "Recoil"
-        recoilBool = True
-
-    legendTitles = []
-    for run in data:
-
-        if (run["info"]["Recoil"] == recoilBool):
-            # Get relevant numscatter hist data
-            thisHist = run["data"]["hists"]["esc_nrg"]
-
-            wallVals = thisHist["walls"]
-            
-            plotVals = thisHist["totalNormalized"]
-            # plotVals = thisHist["perpNormalized"] - thisHist["parNormalized"]
-
-            ax.stairs(plotVals, wallVals, fill=False)
-
-            legendTitles.append(run["info"]["ElectronTemp"])    
-
-    if (i == 0):
-        ax.set_ylabel("Relative Counts")
-    
-    
-    ax.set_xlabel(r"$\omega$")
-
-    ax.set_box_aspect(1)
-
-    ax.set_xscale('log')
-    # ax.set_yscale('log')
-
-    ax.legend(legendTitles, title=r"$\mathcal{T}=kT/mc^2$")
-
-    ax.set_title(recoil)
+for key, func in zip(keys, funcs):
+    # postProcLib.recoilComparisonPlot(data, key, func)
+    postProcLib.recoilComparisonDiffPlot(data, key, func)
 
 
 # %%
