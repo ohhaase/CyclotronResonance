@@ -63,11 +63,22 @@ def importHistogram(runFilePath, name):
 
     # Trick to deal with overflows lol. Didn't think I'd ever need this
     # Python doesn't care fortunately, because ints are implemented very smartly
-    parNegMask = parCountsData < 0
-    perpNegMask = perpCountsData < 0
+    # parNegMask = parCountsData < 0
+    # perpNegMask = perpCountsData < 0
 
-    parCountsData[parNegMask] = 2147483647 + (parCountsData[parNegMask] + 2147483647 + 2)
-    perpCountsData[perpNegMask] = 2147483647 + (perpCountsData[perpNegMask] + 2147483647 + 2)
+    parOverflowBounds = np.nonzero(np.abs(np.diff(parCountsData)) > 1000000000)[0]
+    parOverflowMask = np.zeros_like(parCountsData, dtype=bool)
+    if len(parOverflowBounds) == 2:
+        parOverflowMask[parOverflowBounds[0]+1:parOverflowBounds[1]+1] = True
+
+    perpOverflowBounds = np.nonzero(np.abs(np.diff(perpCountsData)) > 1000000000)[0]
+    perpOverflowMask = np.zeros_like(perpCountsData, dtype=bool)
+    if len(perpOverflowBounds) == 2:
+        perpOverflowMask[perpOverflowBounds[0]+1:perpOverflowBounds[1]+1] = True
+
+
+    parCountsData[parOverflowMask] = 2147483647 + (parCountsData[parOverflowMask] + 2147483647 + 2)
+    perpCountsData[perpOverflowMask] = 2147483647 + (perpCountsData[perpOverflowMask] + 2147483647 + 2)
 
     # Centers for normalization
     centers = np.linspace((wallsData[0]+wallsData[1])/2, (wallsData[-2] + wallsData[-1])/2, wallsData.size-1) # Technically incorrect for log hists, but close enough
@@ -418,6 +429,7 @@ def recoilComparisonDiffPlot(data, key, plotValFunc):
             recoilBool = True
 
         legendTitles = []
+        subLegendLabels = []
         for run in data:
 
             if (run["info"]["Recoil"] == recoilBool):
@@ -429,7 +441,11 @@ def recoilComparisonDiffPlot(data, key, plotValFunc):
                 ax.stairs(plotVals, xWalls, fill=False)
                 subax.stairs(diffs, xWalls, fill=False, )
 
-                legendTitles.append(run["info"]["ElectronTemp"])    
+                parOverPerp = np.trapezoid(thisHist["parCounts"], thisHist["centers"])/np.trapezoid(thisHist["perpCounts"], thisHist["centers"])
+
+                legendTitles.append(run["info"]["ElectronTemp"])
+                subLegendLabels.append(f"{parOverPerp:.3f}")
+                
 
         subax.hlines(0, xWalls[0], xWalls[-1], "black", "--")
 
@@ -437,14 +453,15 @@ def recoilComparisonDiffPlot(data, key, plotValFunc):
             subax.set_ylabel(r"$\perp - \parallel$")
             ax.set_ylabel(yLabel)
         
+        ax.set_xscale(xScale)
+        ax.set_yscale(yScale)
+
         ax.tick_params(axis="x", labelbottom=False)
 
         ax.set_box_aspect(1)
 
-        ax.set_xscale(xScale)
-        ax.set_yscale(yScale)
-
         ax.legend(legendTitles, title=r"$\mathcal{T}=kT/mc^2$")
+        # subax.legend(subLegendLabels, title = r"$\parallel/\perp$", ncol=2, fontsize="small", columnspacing=1, title_fontsize="small")
 
         ax.set_title(recoil)
 
