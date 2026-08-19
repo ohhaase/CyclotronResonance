@@ -6,7 +6,7 @@ To build, we first need to get CMake initialized. Run
 cmake -G "Unix Makefiles" -B build -DCMAKE_CXX_COMPILER='g++'
 ```
 
-This makes a build directory, forces cmake to make a Unix Makefile, and sets the compiler to GNU++. 
+This makes a build directory, forces cmake to make a Unix Makefile, and sets the compiler to GNU++ (note: on my current mac, I have to use g++-15). 
 
 Note: The GNU++ specification might no longer be necessary, since we specify OpenMP with CMake. Before it was used since Clang (on Mac dev environment) didn't have OpenMP. 
 
