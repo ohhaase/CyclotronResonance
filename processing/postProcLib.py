@@ -57,9 +57,22 @@ def importAverages(runFilePath, simParams):
 def importHistogram(runFilePath, name):
     rawData = importData(os.path.join(runFilePath, f"hist_{name}.csv"))
 
-    wallsData = rawData[0, :-1]
-    parCountsData = rawData[1, :-2]
-    perpCountsData = rawData[2, :-2]
+    wallsRaw = rawData[0, :-1]
+    parCountsRaw = rawData[1, :-2]
+    perpCountsRaw = rawData[2, :-2]
+
+    # Combine empty bins for num
+    if name == "num":
+        N = parCountsRaw.size
+        zeroMask = (parCountsRaw == 0) & (perpCountsRaw == 0) & (np.arange(N) < N/2)
+
+        parCountsData = parCountsRaw[~zeroMask]
+        perpCountsData = perpCountsRaw[~zeroMask]
+        wallsData = wallsRaw[~np.append(zeroMask, False)]
+    else:
+        parCountsData = parCountsRaw
+        perpCountsData = perpCountsRaw
+        wallsData = wallsRaw
 
     # Centers for normalization
     centers = np.linspace((wallsData[0]+wallsData[1])/2, (wallsData[-2] + wallsData[-1])/2, wallsData.size-1) # Technically incorrect for log hists, but close enough
