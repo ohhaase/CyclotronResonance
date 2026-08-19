@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <cstdint>
 
 class Histogram
 {
@@ -12,8 +13,8 @@ class Histogram
         double minVal;
         double maxVal;
         double* binWalls;
-        int* counts_par;
-        int* counts_perp;
+        uint64_t* counts_par;
+        uint64_t* counts_perp;
 
         int outOfBoundsCount = 0;
 

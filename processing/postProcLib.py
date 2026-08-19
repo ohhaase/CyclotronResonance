@@ -61,25 +61,6 @@ def importHistogram(runFilePath, name):
     parCountsData = rawData[1, :-2]
     perpCountsData = rawData[2, :-2]
 
-    # Trick to deal with overflows lol. Didn't think I'd ever need this
-    # Python doesn't care fortunately, because ints are implemented very smartly
-    # parNegMask = parCountsData < 0
-    # perpNegMask = perpCountsData < 0
-
-    parOverflowBounds = np.nonzero(np.abs(np.diff(parCountsData)) > 1000000000)[0]
-    parOverflowMask = np.zeros_like(parCountsData, dtype=bool)
-    if len(parOverflowBounds) == 2:
-        parOverflowMask[parOverflowBounds[0]+1:parOverflowBounds[1]+1] = True
-
-    perpOverflowBounds = np.nonzero(np.abs(np.diff(perpCountsData)) > 1000000000)[0]
-    perpOverflowMask = np.zeros_like(perpCountsData, dtype=bool)
-    if len(perpOverflowBounds) == 2:
-        perpOverflowMask[perpOverflowBounds[0]+1:perpOverflowBounds[1]+1] = True
-
-
-    parCountsData[parOverflowMask] = 2147483647 + (parCountsData[parOverflowMask] + 2147483647 + 2)
-    perpCountsData[perpOverflowMask] = 2147483647 + (perpCountsData[perpOverflowMask] + 2147483647 + 2)
-
     # Centers for normalization
     centers = np.linspace((wallsData[0]+wallsData[1])/2, (wallsData[-2] + wallsData[-1])/2, wallsData.size-1) # Technically incorrect for log hists, but close enough
 
@@ -434,9 +415,10 @@ def recoilComparisonDiffPlot(data, key, plotValFunc):
 
             if (run["info"]["Recoil"] == recoilBool):
                 # Get relevant numscatter hist data
+                theseParams = run["info"]
                 thisHist = run["data"]["hists"][key]
 
-                plotVals, xWalls, diffs = plotValFunc(thisHist)
+                plotVals, xWalls, diffs = plotValFunc(theseParams, thisHist)
 
                 ax.stairs(plotVals, xWalls, fill=False)
                 subax.stairs(diffs, xWalls, fill=False, )
@@ -448,6 +430,9 @@ def recoilComparisonDiffPlot(data, key, plotValFunc):
                 
 
         subax.hlines(0, xWalls[0], xWalls[-1], "black", "--")
+
+        if key == "num":
+            subax.set_ylim([-1e-5,1e-5])
 
         if (i == 0):
             subax.set_ylabel(r"$\perp - \parallel$")

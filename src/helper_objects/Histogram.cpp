@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <cstdint>
 
 
 Histogram::Histogram(int inNumBins, double inMin, double inMax, bool logBins)
@@ -37,8 +38,8 @@ Histogram::Histogram(int inNumBins, double inMin, double inMax, bool logBins)
     }
 
     // Initialize the other arrays
-    counts_par = new int[numBins]{}; // Initialized to zero
-    counts_perp = new int[numBins]{}; // Initialized to zero
+    counts_par = new uint64_t[numBins]{}; // Initialized to zero
+    counts_perp = new uint64_t[numBins]{}; // Initialized to zero
 }
 
 
@@ -53,7 +54,7 @@ Histogram::~Histogram()
 void Histogram::addVal(double value, int pol)
 {
     // Figure out which count we add to based on polarization
-    int* thisCount;
+    uint64_t* thisCount;
 
     switch (pol)
     {
