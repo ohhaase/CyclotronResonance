@@ -200,8 +200,10 @@ void simType4()
     // N is number of temps we want to study
     // 2 because we look at recoil on/off for each
 
-    std::vector<double> Thetas = {0.05, 0.025, 0.01, 0.005};
+    // std::vector<double> Thetas = {0.05, 0.025, 0.01, 0.005};
+    std::vector<double> Thetas = {0.0025};
     int recoils[2] = {0, 1}; 
+    electronDistb.setDistb(0);
 
     // Loop over electron temeperatures
     for (int i = 0; i < Thetas.size(); i++)
@@ -227,7 +229,8 @@ void simType4()
             Histogram everyThetaHist{Nbins, 0, M_PI};
             Histogram finalThetaHist{Nbins, 0, M_PI};
             Histogram everyBetaHist{Nbins, -1, 1};
-            Histogram finalCountHist{Nbins, 1, 10000, true};
+            // Histogram finalCountHist{Nbins, 1, 100000, true};
+            Histogram finalCountHist{100000, 0.5, 100000.5};
 
             // Initialize 2D histograms
             Histogram2D nrgXnrgHist2D{Nbins, Nbins, lowerOmega, upperOmega, finalNRGlow, finalNRGhigh, false, true};

@@ -64,7 +64,7 @@ def importHistogram(runFilePath, name):
     # Combine empty bins for num
     if name == "num":
         N = parCountsRaw.size
-        zeroMask = (parCountsRaw == 0) & (perpCountsRaw == 0) & (np.arange(N) < N/2)
+        zeroMask = (parCountsRaw == 0) & (perpCountsRaw == 0) & (np.arange(N) < N/4)
 
         parCountsData = parCountsRaw[~zeroMask]
         perpCountsData = perpCountsRaw[~zeroMask]
@@ -399,18 +399,18 @@ def recoilComparisonDiffPlot(data, key, plotValFunc):
             xLabel = r"Scatter Num"
             xScale = yScale = "log"
         case "nrg" | "esc_nrg":
-            xLabel = r"$\omega$"
+            xLabel = r"$\omega / B$"
             xScale = "log"
         case "theta":
             xLabel = r"$\cos{\Theta}$"
         case "esc_theta":
             xLabel = r"$\Theta$"
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 6))
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
 
     for i, ax in enumerate(axes):
         # Make subaxis for the differences
-        subax = ax.inset_axes([0, -0.3, 1, 0.25], sharex=ax)
+        subax = ax.inset_axes([0, -0.5, 1, 0.45], sharex=ax)
 
         subax.set_xlabel(xLabel)
 
@@ -445,7 +445,8 @@ def recoilComparisonDiffPlot(data, key, plotValFunc):
         subax.hlines(0, xWalls[0], xWalls[-1], "black", "--")
 
         if key == "num":
-            subax.set_ylim([-1e-5,1e-5])
+            # subax.set_ylim([-3e-3,3e-3])
+            subax.set_ylim([-5, 5])
 
         if (i == 0):
             subax.set_ylabel(r"$\perp - \parallel$")
@@ -456,12 +457,14 @@ def recoilComparisonDiffPlot(data, key, plotValFunc):
 
         ax.tick_params(axis="x", labelbottom=False)
 
-        ax.set_box_aspect(1)
+        # ax.set_box_aspect(1)
 
         ax.legend(legendTitles, title=r"$\mathcal{T}=kT/mc^2$")
-        # subax.legend(subLegendLabels, title = r"$\parallel/\perp$", ncol=2, fontsize="small", columnspacing=1, title_fontsize="small")
+        subax.legend(subLegendLabels, title = r"$\parallel/\perp$", ncol=2, fontsize="small", columnspacing=1, title_fontsize="small")
 
         ax.set_title(recoil)
+
+    plt.show()
 
 def test():
     print(os.getcwd())
@@ -481,5 +484,29 @@ def normalize1D(vals, centers):
 def normalize2D(vals, centersx, centersy):
     intVal = np.trapezoid(np.trapezoid(vals, centersy, axis=0), centersx, axis=0)
     return vals/intVal
+
+def rebin(counts, walls, newNum, logSpacing=False):
+
+    if newNum > counts.size:
+        print("New bin count is too big!")
+        return 0
+
+
+    newWalls = np.linspace(walls[0], walls[-1], newNum+1, endpoint=True)
+
+    if logSpacing:
+        newWalls = np.logspace(np.log(walls[0]), np.log(walls[-1]), newNum+1, endpoint=True)
+
+    newCounts = np.zeros(newNum)
+
+    newBinNum = 0
+    for i in range(counts.size):
+        if walls[i+1] <= newWalls[newBinNum+1]:
+            newCounts[newBinNum] += counts[i]
+        else:
+            newBinNum += 1
+            newCounts[newBinNum] += counts[i]
+
+    return newCounts, newWalls
 
 myMap = 'inferno'
