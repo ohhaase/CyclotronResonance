@@ -1,0 +1,6 @@
+{
+    "Nparticles": 100,
+    "Nbins": 10,
+    "simType": 4,
+    "Nthreads": 16
+}

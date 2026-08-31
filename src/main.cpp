@@ -3,22 +3,28 @@
 #include "core/sim_types.hpp"
 #include <iostream>
 #include <fstream>
+#include "nlohmann/json.hpp"
 
 // ===== Main =====
 int main(int argc, char** argv)
 {
-    if (argc < 4)
+    if (argc < 2)
     {
-        std::cout << "Not enough arguments: [Nparticles, Nbins, simType, Nthreads]" << std::endl;
+        std::cout << "Not enough arguments: Missing file path." << std::endl;
         return 1;
     }
-    else
-    {
-        Nparticles = std::atoi(argv[1]);
-        Nbins = std::atoi(argv[2]);
-        simType = std::atoi(argv[3]);
-        Nthreads = std::atoi(argv[4]);
-    }
+
+    std::string filepath = argv[1];
+
+    std::cout << filepath << std::endl;
+
+    std::ifstream inputFile(filepath);
+    nlohmann::json inputParams = nlohmann::json::parse(inputFile);
+
+    Nparticles = inputParams["Nparticles"].get<int>();
+    Nbins = inputParams["Nbins"].get<int>();
+    simType = inputParams["simType"].get<int>();
+    Nthreads = inputParams["Nthreads"].get<int>();
 
     switch (simType)
     {
