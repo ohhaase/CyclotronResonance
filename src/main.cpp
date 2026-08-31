@@ -8,15 +8,15 @@
 // ===== Main =====
 int main(int argc, char** argv)
 {
+    // Confirm correct number of inputs
     if (argc < 2)
     {
         std::cout << "Not enough arguments: Missing file path." << std::endl;
         return 1;
     }
 
+    // Get input json file
     std::string filepath = argv[1];
-
-    std::cout << filepath << std::endl;
 
     std::ifstream inputFile(filepath);
     nlohmann::json inputParams = nlohmann::json::parse(inputFile);
@@ -26,6 +26,7 @@ int main(int argc, char** argv)
     simType = inputParams["simType"].get<int>();
     Nthreads = inputParams["Nthreads"].get<int>();
 
+    // Initiate sim based on sim type
     switch (simType)
     {
         case 1:

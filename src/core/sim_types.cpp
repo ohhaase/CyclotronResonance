@@ -200,8 +200,7 @@ void simType4()
     // N is number of temps we want to study
     // 2 because we look at recoil on/off for each
 
-    // std::vector<double> Thetas = {0.05, 0.025, 0.01, 0.005};
-    std::vector<double> Thetas = {0.0025};
+    std::vector<double> Thetas = {0.05, 0.025, 0.01, 0.005};
     int recoils[2] = {0, 1}; 
     electronDistb.setDistb(0);
 
