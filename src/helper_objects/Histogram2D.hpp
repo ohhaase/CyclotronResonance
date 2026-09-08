@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 class Histogram2D
 {
@@ -11,24 +12,22 @@ class Histogram2D
         double minValX;
         double maxValX;
         double binSizeX;
-        double* binWallsX;
+        std::vector<double> binWallsX;
 
         int numBinsY;
         double minValY;
         double maxValY;
         double binSizeY;
-        double* binWallsY;
+        std::vector<double> binWallsY;
         
         // Both Y major 2D arrays
-        int* counts_par;
-        int* counts_perp;
+        std::vector<int> counts_par;
+        std::vector<int> counts_perp;
 
         int outOfBoundsCount = 0;
 
         Histogram2D(int inNumBinsX, int inNumBinsY, double inMinX, double inMaxX, double inMinY, double inMaxY, 
             bool logBinsX=false, bool logBinsY=false);
-
-        ~Histogram2D();
 
         void addVal(double xValue, double yValue, int pol);
 

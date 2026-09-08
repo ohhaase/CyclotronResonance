@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 Histogram2D::Histogram2D(int inNumBinsX, int inNumBinsY, double inMinX, double inMaxX, double inMinY, double inMaxY, 
     bool logBinsX, bool logBinsY)
@@ -18,7 +19,7 @@ Histogram2D::Histogram2D(int inNumBinsX, int inNumBinsY, double inMinX, double i
     maxValY = inMaxY;
 
     // Initialize the X bin walls
-    binWallsX = new double[numBinsX + 1]{};
+    binWallsX.resize(numBinsX + 1);
     binWallsX[0] = minValX;
 
     if (logBinsX)
@@ -41,7 +42,7 @@ Histogram2D::Histogram2D(int inNumBinsX, int inNumBinsY, double inMinX, double i
     }
 
     // Initialize the Y bin walls
-    binWallsY = new double[numBinsY + 1]{};
+    binWallsY.resize(numBinsY + 1);
     binWallsY[0] = minValY;
 
     if (logBinsY)
@@ -64,42 +65,33 @@ Histogram2D::Histogram2D(int inNumBinsX, int inNumBinsY, double inMinX, double i
     }
 
     // Initialize the count arrays
-    counts_par = new int[numBinsX * numBinsY]{}; // Initialized to zero
-    counts_perp = new int[numBinsX * numBinsY]{}; // Initialized to zero
+    counts_par.resize(numBinsX * numBinsY); // Initialized to zero
+    counts_perp.resize(numBinsX * numBinsY); // Initialized to zero
 
-}
-
-
-Histogram2D::~Histogram2D()
-{
-    delete[] binWallsX;
-    delete[] binWallsY;
-    delete[] counts_par;
-    delete[] counts_perp;
 }
 
 
 void Histogram2D::addVal(double xValue, double yValue, int pol)
 {
     // Figure out which count we add to based on polarization
-    int* thisCount;
+    int* thisCount = counts_par.data();
 
     switch (pol)
     {
         case -1: // Average polarization
         {
             // In this case, we just treat parallel count as the total count
-            thisCount = counts_par;
+            thisCount = counts_par.data();
             break;
         }
         case 0: // Parallel
         {
-            thisCount = counts_par;
+            thisCount = counts_par.data();
             break;
         }
         case 1: // Perp
         {
-            thisCount = counts_perp;
+            thisCount = counts_perp.data();
             break;
         }
 
@@ -148,24 +140,24 @@ void Histogram2D::combineData(Histogram2D& otherHist)
 
 void Histogram2D::overrideVal(double xValue, double yValue, int pol, int val)
 {
-    int* thisCount = counts_par;
+    int* thisCount = counts_par.data();
 
     switch (pol)
     {
         case -1: // Average polarization
         {
             // In this case, we just treat parallel count as the total count
-            thisCount = counts_par;
+            thisCount = counts_par.data();
             break;
         }
         case 0: // Parallel
         {
-            thisCount = counts_par;
+            thisCount = counts_par.data();
             break;
         }
         case 1: // Perp
         {
-            thisCount = counts_perp;
+            thisCount = counts_perp.data();
             break;
         }
 

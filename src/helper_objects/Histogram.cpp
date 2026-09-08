@@ -15,7 +15,7 @@ Histogram::Histogram(int inNumBins, double inMin, double inMax, bool logBins)
     maxVal = inMax;
 
     // Initialize the bin walls
-    binWalls = new double[numBins + 1]{};
+    binWalls.resize(numBins + 1);
     binWalls[0] = minVal;
 
     if (logBins)
@@ -38,16 +38,8 @@ Histogram::Histogram(int inNumBins, double inMin, double inMax, bool logBins)
     }
 
     // Initialize the other arrays
-    counts_par = new uint64_t[numBins]{}; // Initialized to zero
-    counts_perp = new uint64_t[numBins]{}; // Initialized to zero
-}
-
-
-Histogram::~Histogram()
-{
-    delete[] binWalls;
-    delete[] counts_par;
-    delete[] counts_perp;
+    counts_par.resize(numBins); // Initialized to zero
+    counts_perp.resize(numBins); // Initialized to zero
 }
 
 
@@ -61,17 +53,17 @@ void Histogram::addVal(double value, int pol)
         case -1: // Average polarization
         {
             // In this case, we just treat parallel count as the total count
-            thisCount = counts_par;
+            thisCount = counts_par.data();
             break;
         }
         case 0: // Parallel
         {
-            thisCount = counts_par;
+            thisCount = counts_par.data();
             break;
         }
         case 1: // Perp
         {
-            thisCount = counts_perp;
+            thisCount = counts_perp.data();
             break;
         }
 
