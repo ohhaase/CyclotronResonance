@@ -9,6 +9,35 @@
 
 #include "nlohmann/json.hpp"
 
+struct HistInfo
+{
+    Histogram hist;
+    std::string name;
+    std::string val;
+};
+
+
+struct Hist2DInfo
+{
+    Histogram2D hist;
+    std::string name;
+    std::string val_x;
+    std::string val_y;
+};
+
+struct AvgInfo
+{
+    Histogram2D hist;
+    std::string val;
+};
+
+struct HistBounds
+{
+    double min;
+    double max;
+};
+
+
 class OutputHandler
 {
     // Class that initializes, stores, and outputs all the data collection in the sim
@@ -23,15 +52,21 @@ class OutputHandler
 
     private:
 
-        std::vector<Histogram> perScatterHists;
-        std::vector<Histogram2D> perScaterHists2D;
-
-        std::vector<Histogram> perEscapeHists;
-        std::vector<Histogram2D> perEscapeHists2D;
-        // std::vector<HistogramAvg> perEscapeAvgs;
-
+    std::vector<Hist2DInfo> perScatterHists2D;
+    
+    std::vector<HistInfo> perEscapeHists;
+    std::vector<Hist2DInfo> perEscapeHists2D;
+    std::vector<AvgInfo> perEscapeAvgs;
+    
+    void generateHists(nlohmann::json histsInfo);
+    void generate2DHists(nlohmann::json hists2DInfo);
+    void generateAvgHists(nlohmann::json avgsInfo);
+    
+    HistBounds getBounds(nlohmann::json boundsInfo);
+    
     public:
-
+    
+    std::vector<HistInfo> perScatterHists;
         // Constructor (creates objects)
         OutputHandler(nlohmann::json outputParams);
 
