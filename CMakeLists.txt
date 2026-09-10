@@ -38,6 +38,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     src/helper_objects/NumericalDistb.cpp
     src/helper_objects/Timer.cpp
     src/helper_objects/OutputHandler.cpp
+    src/helper_objects/AvgOutput.cpp
 
     # ./src/science_functions/
     src/science_functions/beta_calculations.cpp
