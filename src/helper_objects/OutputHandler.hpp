@@ -4,6 +4,7 @@
 
 #include "Histogram.hpp"
 #include "Histogram2D.hpp"
+#include "AvgOutput.hpp"
 
 #include <vector>
 
@@ -27,8 +28,8 @@ struct Hist2DInfo
 
 struct AvgInfo
 {
-    Histogram2D hist;
-    std::string val;
+    AvgOutput avg;
+    std::string name;
 };
 
 struct HistBounds
@@ -52,29 +53,30 @@ class OutputHandler
 
     private:
 
-    std::vector<Hist2DInfo> perScatterHists2D;
-    
-    std::vector<HistInfo> perEscapeHists;
-    std::vector<Hist2DInfo> perEscapeHists2D;
-    std::vector<AvgInfo> perEscapeAvgs;
-    
-    void generateHists(nlohmann::json histsInfo);
-    void generate2DHists(nlohmann::json hists2DInfo);
-    void generateAvgHists(nlohmann::json avgsInfo);
-    
-    HistBounds getBounds(nlohmann::json boundsInfo);
+        std::vector<HistInfo> perScatterHists;
+        std::vector<Hist2DInfo> perScatterHists2D;
+        
+        std::vector<HistInfo> perEscapeHists;
+        std::vector<Hist2DInfo> perEscapeHists2D;
+        std::vector<AvgInfo> perEscapeAvgs;
+        
+        void generateHists(nlohmann::json histsInfo);
+        void generate2DHists(nlohmann::json hists2DInfo);
+        void generateAvgs(nlohmann::json avgsInfo);
+        
+        HistBounds getBounds(nlohmann::json boundsInfo);
+        double getValForHist(std::string val, PhotonState photon, double beta);
     
     public:
     
-    std::vector<HistInfo> perScatterHists;
         // Constructor (creates objects)
         OutputHandler(nlohmann::json outputParams);
 
 
         // Update objects
-        void perScatterOutputs();
+        void perScatterOutputs(PhotonState photon, double beta);
 
-        void perEscapeOutputs();
+        void perEscapeOutputs(PhotonState initPhoton, PhotonState photon);
 
 
         // Write objects

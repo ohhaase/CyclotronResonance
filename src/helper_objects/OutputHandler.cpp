@@ -8,29 +8,33 @@
 #include "global_vars.hpp"
 #include "helper_objects/Histogram.hpp"
 #include "helper_objects/Histogram2D.hpp"
+#include "helper_objects/AvgOutput.hpp"
 
 
 
 
 OutputHandler::OutputHandler(nlohmann::json outputParams)
 {
-    // JSON that comes in is expected to be of the form:
-    // "hists":
-    //      "hist1": <see generateHists() for structure>
-    //      "hist2": ...
-    //      ...
-    // "hists2D":
-    //      "hist2D_1": <see generate2DHists() for structure>
-    //      "hist2D_2": ...
-    //      ...
-    // "avgs": <see generateAvgHists() for structure>
+    /*
+    JSON that comes in is expected to be of the form:
+    "hists":
+         "hist1": <see generateHists() for structure>
+         "hist2": ...
+         ...
+    "hists2D":
+         "hist2D_1": <see generate2DHists() for structure>
+         "hist2D_2": ...
+         ...
+    "avgs": 
+         "avg1": <see generateAvgHists() for structure>
+         ...
 
-    // Possible values of "val" and the types to use for other inputs:
-    //      "nrg" (double), "theta" (double), "count" (int), "pol" (double), "beta" (double)
+    Possible values of "val" and the types to use for other inputs:
+         "nrg", "theta", "count", "pol", "beta"
 
-    // Possible values of "trigger":
-    //      0: per scatter, 1: per escape
-
+    Possible values of "trigger":
+         0: per scatter, 1: per escape
+    */
     
 
     // Create output objects
@@ -46,21 +50,23 @@ OutputHandler::OutputHandler(nlohmann::json outputParams)
 
     if (outputParams.contains("avgs"))
     {
-        generateAvgHists(outputParams["avgs"]);
+        generateAvgs(outputParams["avgs"]);
     }
 }
 
 
 void OutputHandler::generateHists(nlohmann::json histsInfo)
 {
-    // histsInfo is a json dict where each key is the name of the hist and has the following structure:
+    /*
+    histsInfo is a json dict where each key is the name of the hist and has the following structure:
 
-    //  "histName": 
-    //      "trigger": <int> (see constructor for possible values of "trigger")
-    //      "val": <string> (see constructor for possible values of "val")
-    //      "Nbins": <int>
-    //      "log": <bool>
-    //      "bounds": <json> (see getBounds() function)
+     "histName": 
+         "trigger": <int> (see constructor for possible values of "trigger")
+         "val": <string> (see constructor for possible values of "val")
+         "Nbins": <int>
+         "log": <bool>
+         "bounds": <json> (see getBounds() function)
+    */
 
     // Loop over all hist objects
     for (nlohmann::json::iterator histIterator = histsInfo.begin(); histIterator != histsInfo.end(); ++histIterator)
@@ -103,18 +109,20 @@ void OutputHandler::generateHists(nlohmann::json histsInfo)
 
 void OutputHandler::generate2DHists(nlohmann::json hists2DInfo)
 {
-    // hists2DInfo is a json dict where each key is the name of the hist2D and has the following structure:
+    /*
+    hists2DInfo is a json dict where each key is the name of the hist2D and has the following structure:
 
-    //  "hist2DName":
-    //      "trigger": <int> (see constructor for possible values of "trigger")
-    //      "val_x": <string> (see constructor for possible values of "val")
-    //      "Nbins_x": <int>
-    //      "log_x": <bool>
-    //      "bounds_x": <json> (see getBounds() function)
-    //      "val_y": <string> (see constructor for possible values of "val")
-    //      "Nbins_y": <int>
-    //      "log_y": <bool>
-    //      "bounds_y": <json> (see getBounds() function)
+     "hist2DName":
+         "trigger": <int> (see constructor for possible values of "trigger")
+         "val_x": <string> (see constructor for possible values of "val")
+         "Nbins_x": <int>
+         "log_x": <bool>
+         "bounds_x": <json> (see getBounds() function)
+         "val_y": <string> (see constructor for possible values of "val")
+         "Nbins_y": <int>
+         "log_y": <bool>
+         "bounds_y": <json> (see getBounds() function)
+    */
 
     // Loop over all hist objects
     for (nlohmann::json::iterator hist2DIterator = hists2DInfo.begin(); hist2DIterator != hists2DInfo.end(); ++hist2DIterator)
@@ -164,35 +172,35 @@ void OutputHandler::generate2DHists(nlohmann::json hists2DInfo)
 }
 
 
-void OutputHandler::generateAvgHists(nlohmann::json avgsInfo)
+void OutputHandler::generateAvgs(nlohmann::json avgsInfo)
 {
-    // Average outputs are essentially 2D hists that will simply divide their value by the count at the end
-    // x-axis is energy, y-axis is angle
-    // They should usually have the same angle and energy ranges as the simulation, though this is not hard coded (needs to be the case in the input file)
-    // They will always trigger on photon escape
+    /*
+    Average outputs are essentially 2D hists that will simply divide their value by the count at the end
+    x-axis is energy, y-axis is angle
+    They should usually have the same angle and energy ranges as the simulation, though this is not hard coded (they need to be specified in the input file)
+    They will always trigger on photon escape
 
-    // avgsInfo is a json dict with the following structure:
+    avgsInfo is a json dict where each key is the name of the avg output and has the following structure:
 
-    //  "avgsInfo":
-    //      "vals": <list of "val"> (see constructor for possible values of "val")
-    //      "Nbins_nrg": <int>
-    //      "bounds_nrg": <json> (see getBounds() function)
-    //      "Nbins_theta": <int>
-    //      "bounds_theta": <json> (see getBounds() function)
+     "avg1name":
+         "Nbins_nrg": <int>
+         "bounds_nrg": <json> (see getBounds() function)
+         "Nbins_theta": <int>
+         "bounds_theta": <json> (see getBounds() function)
+    */
 
-
-    std::vector<std::string> vals = avgsInfo["vals"].get<std::vector<std::string>>();
-    int Nbins_nrg = avgsInfo["Nbins_nrg"].get<int>();
-    HistBounds bounds_nrg = getBounds(avgsInfo["bounds_nrg"]);
-    int Nbins_theta = avgsInfo["Nbins_theta"].get<int>();
-    HistBounds bounds_theta = getBounds(avgsInfo["bounds_theta"]);
-
-    // Loop over vals and make histograms
-    for (std::string val : vals)
+    for (nlohmann::json::iterator avgIterator = avgsInfo.begin(); avgIterator != avgsInfo.end(); ++avgIterator)
     {
-        Histogram2D thisHist{Nbins_nrg, Nbins_theta, bounds_nrg.min, bounds_nrg.max, bounds_theta.min, bounds_theta.max};
+        nlohmann::json thisAvgJSON = avgIterator.value();
 
-        AvgInfo thisAvgInfo{thisHist, val};
+        int Nbins_nrg = thisAvgJSON["Nbins_nrg"].get<int>();
+        HistBounds bounds_nrg = getBounds(thisAvgJSON["bounds_nrg"]);
+        int Nbins_theta = thisAvgJSON["Nbins_theta"].get<int>();
+        HistBounds bounds_theta = getBounds(thisAvgJSON["bounds_theta"]);
+
+        AvgOutput thisAvg{Nbins_nrg, Nbins_theta, bounds_nrg.min, bounds_nrg.max, bounds_theta.min, bounds_theta.max};
+
+        AvgInfo thisAvgInfo{thisAvg, avgIterator.key()};
 
         perEscapeAvgs.push_back(thisAvgInfo);
     }
@@ -253,4 +261,60 @@ HistBounds OutputHandler::getBounds(nlohmann::json boundsInfo)
     std::cout << "Hist bins improperly defined!\n";
 
     return bounds; // Better error handling eventually?
+}
+
+
+double OutputHandler::getValForHist(std::string val, PhotonState photon, double beta)
+{
+    double valueToAdd = 0;
+    
+    if (val == "nrg") valueToAdd = photon.omega;
+    
+    if (val == "theta") valueToAdd = photon.theta;
+
+    if (val == "count") valueToAdd = static_cast<double>(photon.numScatterings);
+
+    if (val == "pol") valueToAdd = static_cast<double>(photon.polarization);
+
+    if (val == "beta") valueToAdd = beta;
+
+    return valueToAdd;
+}
+
+
+void OutputHandler::perScatterOutputs(PhotonState photon, double beta)
+{
+    // Add all histogram data
+    for (HistInfo thisHist : perScatterHists)
+    {
+        thisHist.hist.addVal(getValForHist(thisHist.val, photon, beta), photon.polarization);
+    }
+
+    // Add all hist2D data
+    for (Hist2DInfo thisHist : perScatterHists2D)
+    {
+        thisHist.hist.addVal(getValForHist(thisHist.val_x, photon, beta), getValForHist(thisHist.val_y, photon, beta), photon.polarization);
+    }
+}
+
+
+void OutputHandler::perEscapeOutputs(PhotonState initPhoton, PhotonState photon)
+{
+    // Add all histogram data
+    for (HistInfo thisHist : perEscapeHists)
+    {
+        thisHist.hist.addVal(getValForHist(thisHist.val, photon, 0), photon.polarization);
+    }
+
+    // Add all hist2D data
+    for (Hist2DInfo thisHist : perEscapeHists2D)
+    {
+        thisHist.hist.addVal(getValForHist(thisHist.val_x, photon, 0), getValForHist(thisHist.val_y, photon, 0), photon.polarization);
+    }
+
+    // Add all average data
+    for (AvgInfo thisAvg : perEscapeAvgs)
+    {
+        thisAvg.avg.addVal(initPhoton, photon);
+    }
 }
