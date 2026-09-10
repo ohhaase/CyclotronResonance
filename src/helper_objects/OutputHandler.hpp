@@ -41,15 +41,18 @@ struct HistBounds
 
 class OutputHandler
 {
-    // Class that initializes, stores, and outputs all the data collection in the sim
-    // - Uses the input file to determine which outputs to create. Can be:
-    //      - Histogram
-    //      - Avg output
-    // - Initializes output objects
-    // - During the simulation, stores values into these objects. Can happen:
-    //      - After each scatter
-    //      - After photon escapes
-    // - At the end of the simulation, tells all output objects to write their files.
+    /*
+    Class that initializes, stores, and outputs all the data collection in the sim
+    - Uses the input file to determine which outputs to create. Can be:
+         - Histogram
+         - 2D Histogram
+         - Avg output
+    - Initializes output objects
+    - During the simulation, stores values into these objects. Can happen:
+         - After each scatter
+         - After photon escapes
+    - At the end of the simulation, tells all output objects to write their files.
+    */
 
     private:
 
@@ -80,5 +83,5 @@ class OutputHandler
 
 
         // Write objects
-        void writeOutputs();
+        void writeOutputs(std::string folder);
 };

@@ -318,3 +318,37 @@ void OutputHandler::perEscapeOutputs(PhotonState initPhoton, PhotonState photon)
         thisAvg.avg.addVal(initPhoton, photon);
     }
 }
+
+
+void OutputHandler::writeOutputs(std::string folder)
+{
+    // Write all per scatter hists
+    for (HistInfo thisHist : perScatterHists)
+    {
+        thisHist.hist.exportToFile(thisHist.name, folder);
+    }
+
+    // Write all per scatter 2D hists
+    for (Hist2DInfo thisHist2D : perScatterHists2D)
+    {
+        thisHist2D.hist.exportToFile(thisHist2D.name, folder);
+    }
+
+    // Write all per escape hists
+    for (HistInfo thisHist : perScatterHists)
+    {
+        thisHist.hist.exportToFile(thisHist.name, folder);
+    }
+
+    // Write all per escape 2D hists
+    for (Hist2DInfo thisHist2D : perEscapeHists2D)
+    {
+        thisHist2D.hist.exportToFile(thisHist2D.name, folder);
+    }
+
+    // Write all per escape avgs
+    for (AvgInfo thisAvg : perEscapeAvgs)
+    {
+        thisAvg.avg.exportToFile(thisAvg.name, folder);
+    }
+}

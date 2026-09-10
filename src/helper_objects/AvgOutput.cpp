@@ -109,7 +109,7 @@ void AvgOutput::addVal(PhotonState initPhoton, PhotonState photon)
 
 void AvgOutput::exportToFile(const std::string& name, const std::string& folder)
 {
-    std::string fileName = "avg_" + name + ".csv";
+    std::string fileName = name + ".csv";
 
     if (folder != "None")
     {
