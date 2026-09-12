@@ -2,6 +2,8 @@
 
 #include "nlohmann/json.hpp"
 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <iostream>
 #include <string>
 
@@ -28,9 +30,6 @@ OutputHandler::OutputHandler(nlohmann::json outputParams)
     "avgs": 
          "avg1": <see generateAvgHists() for structure>
          ...
-
-    Possible values of "val" and the types to use for other inputs:
-         "nrg", "theta", "count", "pol", "beta"
 
     Possible values of "trigger":
          0: per scatter, 1: per escape
@@ -62,7 +61,7 @@ void OutputHandler::generateHists(nlohmann::json histsInfo)
 
      "histName": 
          "trigger": <int> (see constructor for possible values of "trigger")
-         "val": <string> (see constructor for possible values of "val")
+         "val": <string> (see stringToValtype() for possible values)
          "Nbins": <int>
          "log": <bool>
          "bounds": <json> (see getBounds() function)
@@ -82,7 +81,7 @@ void OutputHandler::generateHists(nlohmann::json histsInfo)
 
         Histogram thisHist{Nbins, bounds.min, bounds.max, isLog};
 
-        HistInfo thisHistInfo{thisHist, histIterator.key(), val};
+        HistInfo thisHistInfo{thisHist, histIterator.key(), stringToValtype(val)};
 
         switch (trigger)
         {
@@ -114,11 +113,11 @@ void OutputHandler::generate2DHists(nlohmann::json hists2DInfo)
 
      "hist2DName":
          "trigger": <int> (see constructor for possible values of "trigger")
-         "val_x": <string> (see constructor for possible values of "val")
+         "val_x": <string> (see stringToValtype() for possible values)
          "Nbins_x": <int>
          "log_x": <bool>
          "bounds_x": <json> (see getBounds() function)
-         "val_y": <string> (see constructor for possible values of "val")
+         "val_y": <string> (see stringToValtype() for possible values)
          "Nbins_y": <int>
          "log_y": <bool>
          "bounds_y": <json> (see getBounds() function)
@@ -147,7 +146,7 @@ void OutputHandler::generate2DHists(nlohmann::json hists2DInfo)
 
         Histogram2D thisHist{Nbins_x, Nbins_y, bounds_x.min, bounds_x.max, bounds_y.min, bounds_y.max, isLog_x, isLog_y};
 
-        Hist2DInfo thisHistInfo{thisHist, hist2DIterator.key(), val_x, val_y};
+        Hist2DInfo thisHistInfo{thisHist, hist2DIterator.key(), stringToValtype(val_x), stringToValtype(val_y)};
 
         switch (trigger)
         {
@@ -214,7 +213,7 @@ HistBounds OutputHandler::getBounds(nlohmann::json boundsInfo)
     // If custom, this func unpacks the values
 
     // Input JSON has three possible keys:
-    // "type": <string> (can be "nrg", "theta", "beta", "custom")
+    // "type": <string> (can be "nrg", "esc_nrg", "theta", "beta", "custom")
     // "min": <double> (min value, only needed if "type"="custom")
     // "max": <double> (max value, only needed if "type"="custom")
 
@@ -226,6 +225,14 @@ HistBounds OutputHandler::getBounds(nlohmann::json boundsInfo)
     {
         bounds.min = lowerOmega;
         bounds.max = upperOmega;
+
+        return bounds;
+    }
+
+    if (type == "esc_nrg")
+    {
+        bounds.min = finalNRGlow;
+        bounds.max = finalNRGhigh;
 
         return bounds;
     }
@@ -264,58 +271,116 @@ HistBounds OutputHandler::getBounds(nlohmann::json boundsInfo)
 }
 
 
-double OutputHandler::getValForHist(std::string val, PhotonState photon, double beta)
+VALTYPE OutputHandler::stringToValtype(std::string val)
 {
-    double valueToAdd = 0;
-    
-    if (val == "nrg") valueToAdd = photon.omega;
-    
-    if (val == "theta") valueToAdd = photon.theta;
+    /*
+    We include this separate function so that writing values to histograms can be optimized
+    Possible values of "val":
+         "nrg", "theta", "count", "pol", "beta", "init_nrg", "init_theta", "init_pol"
+    */
 
-    if (val == "count") valueToAdd = static_cast<double>(photon.numScatterings);
+    if (val == "nrg") return VALTYPE::NRG;
 
-    if (val == "pol") valueToAdd = static_cast<double>(photon.polarization);
+    if (val == "theta") return VALTYPE::THETA;
 
-    if (val == "beta") valueToAdd = beta;
+    if (val == "count") return VALTYPE::COUNT;
 
-    return valueToAdd;
+    if (val == "pol") return VALTYPE::POL;
+
+    if (val == "beta") return VALTYPE::BETA;
+
+    if (val == "init_nrg") return VALTYPE::INIT_NRG;
+
+    if (val == "init_theta") return VALTYPE::INIT_THETA;
+
+    if (val == "init_pol") return VALTYPE::INIT_POL;
+
+    // If we get to this point, something is awry
+    std::cout << "Prescribed val for hist is invalid.\n";
+    return VALTYPE::NRG;
+} 
+
+
+
+double OutputHandler::getValForHist(VALTYPE val, SimData& data)
+{        
+    switch (val)
+    {
+        case VALTYPE::NRG:
+        {
+            return data.photon.omega;
+        }
+        case VALTYPE::THETA:
+        {
+            return data.photon.theta;
+        }
+        case VALTYPE::COUNT:
+        {
+            return static_cast<double>(data.photon.numScatterings);
+        }
+        case VALTYPE::POL:
+        {
+            return static_cast<double>(data.photon.polarization);
+        }
+        case VALTYPE::BETA:
+        {
+            return data.beta;
+        }
+        case VALTYPE::INIT_NRG:
+        {
+            return data.initPhoton.omega;
+        }
+        case VALTYPE::INIT_THETA:
+        {
+            return data.initPhoton.theta;
+        }
+        case VALTYPE::INIT_POL:
+        {
+            return data.initPhoton.polarization;
+        }
+        default:
+        {
+            std::cout << "Tried to write unknown value to hist\n";
+            return -1;
+        }
+    }
 }
 
 
-void OutputHandler::perScatterOutputs(PhotonState photon, double beta)
+void OutputHandler::perScatterOutputs(SimData& data)
 {
     // Add all histogram data
     for (HistInfo thisHist : perScatterHists)
     {
-        thisHist.hist.addVal(getValForHist(thisHist.val, photon, beta), photon.polarization);
+        thisHist.hist.addVal(getValForHist(thisHist.val, data), data.photon.polarization);
     }
 
     // Add all hist2D data
     for (Hist2DInfo thisHist : perScatterHists2D)
     {
-        thisHist.hist.addVal(getValForHist(thisHist.val_x, photon, beta), getValForHist(thisHist.val_y, photon, beta), photon.polarization);
+        thisHist.hist.addVal(getValForHist(thisHist.val_x, data), getValForHist(thisHist.val_y, data), data.photon.polarization);
     }
 }
 
 
-void OutputHandler::perEscapeOutputs(PhotonState initPhoton, PhotonState photon)
+void OutputHandler::perEscapeOutputs(SimData& data)
 {
     // Add all histogram data
     for (HistInfo thisHist : perEscapeHists)
     {
-        thisHist.hist.addVal(getValForHist(thisHist.val, photon, 0), photon.polarization);
+        thisHist.hist.addVal(getValForHist(thisHist.val, data), data.photon.polarization);
     }
 
     // Add all hist2D data
     for (Hist2DInfo thisHist : perEscapeHists2D)
     {
-        thisHist.hist.addVal(getValForHist(thisHist.val_x, photon, 0), getValForHist(thisHist.val_y, photon, 0), photon.polarization);
+        thisHist.hist.addVal(getValForHist(thisHist.val_x, data), getValForHist(thisHist.val_y, data), data.photon.polarization);
     }
 
     // Add all average data
     for (AvgInfo thisAvg : perEscapeAvgs)
     {
-        thisAvg.avg.addVal(initPhoton, photon);
+        thisAvg.avg.addVal(data.initPhoton, data.photon);
     }
 }
 

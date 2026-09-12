@@ -10,20 +10,31 @@
 
 #include "nlohmann/json.hpp"
 
+enum struct VALTYPE
+{
+    NRG,
+    THETA,
+    COUNT,
+    POL,
+    BETA,
+    INIT_NRG,
+    INIT_THETA,
+    INIT_POL
+};
+
 struct HistInfo
 {
     Histogram hist;
     std::string name;
-    std::string val;
+    VALTYPE val;
 };
-
 
 struct Hist2DInfo
 {
     Histogram2D hist;
     std::string name;
-    std::string val_x;
-    std::string val_y;
+    VALTYPE val_x;
+    VALTYPE val_y;
 };
 
 struct AvgInfo
@@ -36,6 +47,13 @@ struct HistBounds
 {
     double min;
     double max;
+};
+
+struct SimData
+{
+    PhotonState photon;
+    PhotonState initPhoton;
+    double beta;
 };
 
 
@@ -68,7 +86,8 @@ class OutputHandler
         void generateAvgs(nlohmann::json avgsInfo);
         
         HistBounds getBounds(nlohmann::json boundsInfo);
-        double getValForHist(std::string val, PhotonState photon, double beta);
+        VALTYPE stringToValtype(std::string val);
+        double getValForHist(VALTYPE val, SimData& currentState);
     
     public:
     
@@ -77,9 +96,9 @@ class OutputHandler
 
 
         // Update objects
-        void perScatterOutputs(PhotonState photon, double beta);
+        void perScatterOutputs(SimData& currentState);
 
-        void perEscapeOutputs(PhotonState initPhoton, PhotonState photon);
+        void perEscapeOutputs(SimData& currentState);
 
 
         // Write objects
