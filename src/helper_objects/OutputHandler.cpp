@@ -276,14 +276,14 @@ VALTYPE OutputHandler::stringToValtype(std::string val)
     /*
     We include this separate function so that writing values to histograms can be optimized
     Possible values of "val":
-         "nrg", "theta", "count", "pol", "beta", "init_nrg", "init_theta", "init_pol"
+         "nrg", "theta", "num", "pol", "beta", "init_nrg", "init_theta", "init_pol"
     */
 
     if (val == "nrg") return VALTYPE::NRG;
 
     if (val == "theta") return VALTYPE::THETA;
 
-    if (val == "count") return VALTYPE::COUNT;
+    if (val == "num") return VALTYPE::NUM;
 
     if (val == "pol") return VALTYPE::POL;
 
@@ -314,7 +314,7 @@ double OutputHandler::getValForHist(VALTYPE val, SimData& data)
         {
             return data.photon.theta;
         }
-        case VALTYPE::COUNT:
+        case VALTYPE::NUM:
         {
             return static_cast<double>(data.photon.numScatterings);
         }

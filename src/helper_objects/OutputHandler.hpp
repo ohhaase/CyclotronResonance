@@ -14,7 +14,7 @@ enum struct VALTYPE
 {
     NRG,
     THETA,
-    COUNT,
+    NUM,
     POL,
     BETA,
     INIT_NRG,
