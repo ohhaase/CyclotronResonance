@@ -76,58 +76,93 @@ def numPlotVals(theseParams, thisHist):
     plotVals = thisHist["totalNormalized"]
 
     # diffs = thisHist["perpNormalized"] - thisHist["parNormalized"]
-    diffs = thisHist["perpCounts"]/thisHist["parCounts"] - 3
+    # diffs = (thisHist["perpCounts"] - thisHist["parCounts"])/(thisHist["perpCounts"] + thisHist["parCounts"])
+    diffs = (thisHist["perpNormalized"] - thisHist["parNormalized"]) / (thisHist["perpNormalized"] + thisHist["parNormalized"])
 
     xWalls = thisHist["walls"]
 
     return plotVals, xWalls, diffs
 
-def muPlotVals(theseParams, thisHist):
-    plotVals = thisHist["totalNormalized"]
-    plotVals = plotVals / np.sin(thisHist["centers"]) - 0.5
+numPlotDict = {
+    "val": "num",
+    "func": numPlotVals,
+    "xLabel": r"Scatter Num",
+    "xScale": "log",
+    "yScale": "log",
+    "filename": "scattercount.png"
+}
 
-    diffs = thisHist["perpNormalized"] - thisHist["parNormalized"]
-    diffs = diffs / np.sin(thisHist["centers"])
+def muPlotVals(theseParams, thisHist):
+    plotVals = thisHist["totalNormalized"] / np.sin(thisHist["centers"]) - 0.5
+
+    diffs = (thisHist["perpCounts"] - thisHist["parCounts"])/(thisHist["perpCounts"] + thisHist["parCounts"])
 
     xWalls = np.cos(thisHist["walls"])
 
     return plotVals, xWalls, diffs
 
+muPlotDict = {
+    "val": "theta",
+    "func": muPlotVals,
+    "xLabel": r"$\cos{\Theta}$",
+    "filename": "scattercosines.png"
+}
+
 def escThetaPlotVals(theseParams, thisHist):
     # plotVals = thisHist["totalCounts"]
     plotVals = thisHist["totalNormalized"]
 
-    diffs = thisHist["perpNormalized"] - thisHist["parNormalized"]
+    diffs = (thisHist["perpCounts"] - thisHist["parCounts"])/(thisHist["perpCounts"] + thisHist["parCounts"])
 
     xWalls = thisHist["walls"]
 
     return plotVals, xWalls, diffs
 
+escThetaPlotDict = {
+    "val": "esc_theta",
+    "func": escThetaPlotVals,
+    "xLabel": r"$\Theta$",
+    "filename": "finalangles.png"
+}
+
 def nrgPlotVals(theseParams, thisHist):
     # plotVals = thisHist["totalCounts"]
     plotVals = thisHist["totalNormalized"]
 
-    diffs = thisHist["perpNormalized"] - thisHist["parNormalized"]
+    diffs = (thisHist["perpCounts"] - thisHist["parCounts"])/(thisHist["perpCounts"] + thisHist["parCounts"])
 
     xWalls = thisHist["walls"] / theseParams["FieldStrength"]
 
     return plotVals, xWalls, diffs
+
+nrgPlotDict = {
+    "val": "nrg",
+    "func": nrgPlotVals,
+    "xLabel": r"$\omega / B$",
+    "filename": "scatternrg.png"
+}
 
 def escNRGPlotVals(theseParams, thisHist):
     # plotVals = thisHist["totalCounts"]
     plotVals = thisHist["totalNormalized"]
 
-    diffs = thisHist["perpNormalized"] - thisHist["parNormalized"]
+    diffs = (thisHist["perpCounts"] - thisHist["parCounts"])/(thisHist["perpCounts"] + thisHist["parCounts"])
 
     xWalls = thisHist["walls"] / theseParams["FieldStrength"]
 
     return plotVals, xWalls, diffs
 
-keys = ["num", "theta", "nrg", "esc_theta", "esc_nrg"]
-funcs = [numPlotVals, muPlotVals, nrgPlotVals, escThetaPlotVals, escNRGPlotVals]
+escNRGPlotDict = {
+    "val": "esc_nrg",
+    "func": escNRGPlotVals,
+    "xLabel": r"$\omega / B$",
+    "filename": "finalnrg.png"
+}
 
-for key, func in zip(keys, funcs):
-    postProcLib.recoilComparisonDiffPlot(data, key, func)
+dicts = [numPlotDict, muPlotDict, escThetaPlotDict, nrgPlotDict, escNRGPlotDict]
+
+for thisDict in dicts:
+    postProcLib.recoilComparisonDiffPlot(data, thisDict)
 
 
 # %%
