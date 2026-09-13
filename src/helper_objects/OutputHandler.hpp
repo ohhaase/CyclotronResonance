@@ -73,14 +73,6 @@ class OutputHandler
     */
 
     private:
-
-        std::vector<HistInfo> perScatterHists;
-        std::vector<Hist2DInfo> perScatterHists2D;
-        
-        std::vector<HistInfo> perEscapeHists;
-        std::vector<Hist2DInfo> perEscapeHists2D;
-        std::vector<AvgInfo> perEscapeAvgs;
-        
         void generateHists(nlohmann::json histsInfo);
         void generate2DHists(nlohmann::json hists2DInfo);
         void generateAvgs(nlohmann::json avgsInfo);
@@ -90,15 +82,25 @@ class OutputHandler
         double getValForHist(VALTYPE val, SimData& currentState);
     
     public:
+        std::vector<HistInfo> perScatterHists;
+        std::vector<Hist2DInfo> perScatterHists2D;
+        
+        std::vector<HistInfo> perEscapeHists;
+        std::vector<Hist2DInfo> perEscapeHists2D;
+        std::vector<AvgInfo> perEscapeAvgs;
     
         // Constructor (creates objects)
         OutputHandler(nlohmann::json outputParams);
 
 
         // Update objects
-        void perScatterOutputs(SimData& currentState);
+        void perScatterOutputs(SimData currentState);
 
-        void perEscapeOutputs(SimData& currentState);
+        void perEscapeOutputs(SimData currentState);
+
+
+        // Combine outputs
+        void combineOutputs(OutputHandler other);
 
 
         // Write objects

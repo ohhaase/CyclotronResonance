@@ -347,7 +347,7 @@ double OutputHandler::getValForHist(VALTYPE val, SimData& data)
 }
 
 
-void OutputHandler::perScatterOutputs(SimData& data)
+void OutputHandler::perScatterOutputs(SimData data)
 {
     // Add all histogram data
     for (HistInfo thisHist : perScatterHists)
@@ -363,7 +363,7 @@ void OutputHandler::perScatterOutputs(SimData& data)
 }
 
 
-void OutputHandler::perEscapeOutputs(SimData& data)
+void OutputHandler::perEscapeOutputs(SimData data)
 {
     // Add all histogram data
     for (HistInfo thisHist : perEscapeHists)
@@ -415,5 +415,44 @@ void OutputHandler::writeOutputs(std::string folder)
     for (AvgInfo thisAvg : perEscapeAvgs)
     {
         thisAvg.avg.exportToFile(thisAvg.name, folder);
+    }
+}
+
+
+void OutputHandler::combineOutputs(OutputHandler other)
+{
+    // This function serves to combine all the data structures within an output handler
+
+    // Note: assumes that both handlers were created with the same output json!!
+    // No reason they wouldn't be for current usecases, but be careful!
+
+    // Per scatter hists
+    for (int i = 0; i < perScatterHists.size(); i++)
+    {
+        perScatterHists[i].hist.combineData(other.perScatterHists[i].hist);
+    }
+
+    // Per scatter 2D hists
+    for (int i = 0; i < perScatterHists2D.size(); i++)
+    {
+        perScatterHists2D[i].hist.combineData(other.perScatterHists2D[i].hist);
+    }
+
+    // Per escape hists
+    for (int i = 0; i < perEscapeHists.size(); i++)
+    {
+        perEscapeHists[i].hist.combineData(other.perScatterHists[i].hist);
+    }
+
+    // Per escape 2D hists
+    for (int i = 0; i < perEscapeHists2D.size(); i++)
+    {
+        perEscapeHists2D[i].hist.combineData(other.perEscapeHists2D[i].hist);
+    }
+
+    // Per escape avgs
+    for (int i = 0; i < perEscapeAvgs.size(); i++)
+    {
+        perEscapeAvgs[i].avg.combineData(other.perEscapeAvgs[i].avg);
     }
 }
