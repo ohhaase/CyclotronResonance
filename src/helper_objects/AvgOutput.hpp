@@ -37,4 +37,6 @@ class AvgOutput
         void addVal(PhotonState initPhoton, PhotonState photon);
 
         void exportToFile(const std::string& name, const std::string& folder = "None");
+
+        void combineData(AvgOutput& other);
 };

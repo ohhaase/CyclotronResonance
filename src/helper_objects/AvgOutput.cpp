@@ -143,3 +143,20 @@ void AvgOutput::exportToFile(const std::string& name, const std::string& folder)
 
     file.close();
 }
+
+
+void AvgOutput::combineData(AvgOutput& other)
+{
+    // Combine count data from other histogram
+    // Assumes all values are the same!! We don't stop if they aren't so be careful!
+
+    // Simply loop over count arrays and add them together
+    for (int i = 0; i < numBinsX * numBinsY; i++)
+    {
+        counts[i] += other.counts[i];
+        total_nrg[i] += other.total_nrg[i];
+        total_theta[i] += other.total_theta[i];
+        total_escape_count[i] += other.total_escape_count[i];
+        total_polarization[i] += other.total_polarization[i];
+    }
+}
