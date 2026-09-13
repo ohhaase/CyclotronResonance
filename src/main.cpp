@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include "nlohmann/json.hpp"
+#include "helper_objects/OutputHandler.hpp"
 
 // ===== Main =====
 int main(int argc, char** argv)
@@ -57,6 +58,18 @@ int main(int argc, char** argv)
         case 6:
         {
             simType6();
+            break;
+        }
+        case 7:
+        {
+            // // Temporary test case
+            // OutputHandler handler(inputParams["output"]);
+
+            // for (HistInfo info : handler.perScatterHists)
+            // {
+            //     std::cout << info.hist.minVal << " " << info.hist.maxVal << "\n";
+            // }
+
             break;
         }
         default:
