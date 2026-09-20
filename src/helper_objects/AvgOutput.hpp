@@ -13,13 +13,11 @@ class AvgOutput
         int numBinsX;
         double minValX;
         double maxValX;
-        double binSizeX;
         std::vector<double> binWallsX;
 
         int numBinsY;
         double minValY;
         double maxValY;
-        double binSizeY;
         std::vector<double> binWallsY;
         
         // Y major 2D arrays

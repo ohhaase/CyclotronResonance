@@ -131,8 +131,8 @@ void AvgOutput::exportToFile(const std::string& name, const std::string& folder)
         {
             int ind = i*numBinsY + j;
 
-            file << 0.5*(binWallsX[ind] + binWallsX[ind + numBinsY]) << "," << 
-                0.5*(binWallsY[ind] + binWallsY[ind + 1]) << "," << 
+            file << 0.5*(binWallsX[i] + binWallsX[i + 1]) << "," << 
+                0.5*(binWallsY[j] + binWallsY[j + 1]) << "," << 
                 total_nrg[ind] / counts[ind] << "," <<
                 total_theta[ind] / counts[ind] << "," <<
                 total_escape_count[ind] / counts[ind] << "," <<
