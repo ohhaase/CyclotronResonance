@@ -1,5 +1,7 @@
 #pragma once
 
+#include "nlohmann/json.hpp"
+
 // ===== Helpers =====
 void storeSimInfo();
 void exportSimInfo();
@@ -11,3 +13,4 @@ void simType3();
 void simType4();
 void simType5();
 void simType6();
+void simType7(nlohmann::json outputjson);

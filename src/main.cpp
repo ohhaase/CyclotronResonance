@@ -62,13 +62,7 @@ int main(int argc, char** argv)
         }
         case 7:
         {
-            // // Temporary test case
-            // OutputHandler handler(inputParams["output"]);
-
-            // for (HistInfo info : handler.perScatterHists)
-            // {
-            //     std::cout << info.hist.minVal << " " << info.hist.maxVal << "\n";
-            // }
+            simType7(inputParams["output"]);
 
             break;
         }

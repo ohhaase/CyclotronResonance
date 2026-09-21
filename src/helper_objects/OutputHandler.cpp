@@ -213,7 +213,7 @@ HistBounds OutputHandler::getBounds(nlohmann::json boundsInfo)
     // If custom, this func unpacks the values
 
     // Input JSON has three possible keys:
-    // "type": <string> (can be "nrg", "esc_nrg", "theta", "beta", "custom")
+    // "type": <string> (can be "nrg", "esc_nrg", "theta", "beta", "num", "custom")
     // "min": <double> (min value, only needed if "type"="custom")
     // "max": <double> (max value, only needed if "type"="custom")
 
@@ -249,6 +249,14 @@ HistBounds OutputHandler::getBounds(nlohmann::json boundsInfo)
     {
         bounds.min = -1;
         bounds.max = 1;
+
+        return bounds;
+    }
+
+    if (type == "num")
+    {
+        bounds.min = 0.5;
+        bounds.max = 100000.5;
 
         return bounds;
     }
@@ -350,13 +358,13 @@ double OutputHandler::getValForHist(VALTYPE val, SimData& data)
 void OutputHandler::perScatterOutputs(SimData data)
 {
     // Add all histogram data
-    for (HistInfo thisHist : perScatterHists)
+    for (HistInfo& thisHist : perScatterHists)
     {
         thisHist.hist.addVal(getValForHist(thisHist.val, data), data.photon.polarization);
     }
 
     // Add all hist2D data
-    for (Hist2DInfo thisHist : perScatterHists2D)
+    for (Hist2DInfo& thisHist : perScatterHists2D)
     {
         thisHist.hist.addVal(getValForHist(thisHist.val_x, data), getValForHist(thisHist.val_y, data), data.photon.polarization);
     }
@@ -366,19 +374,19 @@ void OutputHandler::perScatterOutputs(SimData data)
 void OutputHandler::perEscapeOutputs(SimData data)
 {
     // Add all histogram data
-    for (HistInfo thisHist : perEscapeHists)
+    for (HistInfo& thisHist : perEscapeHists)
     {
         thisHist.hist.addVal(getValForHist(thisHist.val, data), data.photon.polarization);
     }
 
     // Add all hist2D data
-    for (Hist2DInfo thisHist : perEscapeHists2D)
+    for (Hist2DInfo& thisHist : perEscapeHists2D)
     {
         thisHist.hist.addVal(getValForHist(thisHist.val_x, data), getValForHist(thisHist.val_y, data), data.photon.polarization);
     }
 
     // Add all average data
-    for (AvgInfo thisAvg : perEscapeAvgs)
+    for (AvgInfo& thisAvg : perEscapeAvgs)
     {
         thisAvg.avg.addVal(data.initPhoton, data.photon);
     }
@@ -388,31 +396,31 @@ void OutputHandler::perEscapeOutputs(SimData data)
 void OutputHandler::writeOutputs(std::string folder)
 {
     // Write all per scatter hists
-    for (HistInfo thisHist : perScatterHists)
+    for (HistInfo& thisHist : perScatterHists)
     {
         thisHist.hist.exportToFile(thisHist.name, folder);
     }
 
     // Write all per scatter 2D hists
-    for (Hist2DInfo thisHist2D : perScatterHists2D)
+    for (Hist2DInfo& thisHist2D : perScatterHists2D)
     {
         thisHist2D.hist.exportToFile(thisHist2D.name, folder);
     }
 
     // Write all per escape hists
-    for (HistInfo thisHist : perScatterHists)
+    for (HistInfo& thisHist : perEscapeHists)
     {
         thisHist.hist.exportToFile(thisHist.name, folder);
     }
 
     // Write all per escape 2D hists
-    for (Hist2DInfo thisHist2D : perEscapeHists2D)
+    for (Hist2DInfo& thisHist2D : perEscapeHists2D)
     {
         thisHist2D.hist.exportToFile(thisHist2D.name, folder);
     }
 
     // Write all per escape avgs
-    for (AvgInfo thisAvg : perEscapeAvgs)
+    for (AvgInfo& thisAvg : perEscapeAvgs)
     {
         thisAvg.avg.exportToFile(thisAvg.name, folder);
     }
@@ -441,7 +449,7 @@ void OutputHandler::combineOutputs(OutputHandler other)
     // Per escape hists
     for (int i = 0; i < perEscapeHists.size(); i++)
     {
-        perEscapeHists[i].hist.combineData(other.perScatterHists[i].hist);
+        perEscapeHists[i].hist.combineData(other.perEscapeHists[i].hist);
     }
 
     // Per escape 2D hists

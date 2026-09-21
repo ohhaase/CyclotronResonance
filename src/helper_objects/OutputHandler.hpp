@@ -51,8 +51,8 @@ struct HistBounds
 
 struct SimData
 {
-    PhotonState photon;
     PhotonState initPhoton;
+    PhotonState photon;
     double beta;
 };
 
