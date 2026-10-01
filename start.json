@@ -1,6 +1,6 @@
 {
-    "Nparticles": 40000,
-    "Nbins": 20,
+    "Nparticles": 100000000,
+    "Nbins": 50,
     "simType": 7,
     "Nthreads": 16,
 
@@ -9,7 +9,7 @@
             "beta": {
                 "trigger": 0,
                 "val": "beta",
-                "Nbins": 20,
+                "Nbins": 50,
                 "log": false,
                 "bounds": {
                     "type": "beta"
@@ -29,7 +29,7 @@
             "nrg": {
                 "trigger": 0,
                 "val": "nrg",
-                "Nbins": 20,
+                "Nbins": 50,
                 "log": true,
                 "bounds": {
                     "type": "nrg"
@@ -39,7 +39,7 @@
             "esc_nrg": {
                 "trigger": 1,
                 "val": "nrg",
-                "Nbins": 20,
+                "Nbins": 50,
                 "log": true,
                 "bounds": {
                     "type": "esc_nrg"
@@ -49,7 +49,7 @@
             "theta": {
                 "trigger": 0,
                 "val": "theta",
-                "Nbins": 20,
+                "Nbins": 50,
                 "log": false,
                 "bounds": {
                     "type": "theta"
@@ -59,7 +59,7 @@
             "esc_theta": {
                 "trigger": 1,
                 "val": "theta",
-                "Nbins": 20,
+                "Nbins": 50,
                 "log": false,
                 "bounds": {
                     "type": "theta"
@@ -71,13 +71,13 @@
             "nrgXnrg": {
                 "trigger": 1,
                 "val_x": "init_nrg",
-                "Nbins_x": 20,
+                "Nbins_x": 50,
                 "log_x": false,
                 "bounds_x": {
                     "type": "nrg"
                 },
                 "val_y": "nrg",
-                "Nbins_y": 20,
+                "Nbins_y": 50,
                 "log_y": true,
                 "bounds_y": {
                     "type": "esc_nrg"
@@ -87,13 +87,13 @@
             "nrgXtheta": {
                 "trigger": 1,
                 "val_x": "init_nrg",
-                "Nbins_x": 20,
+                "Nbins_x": 50,
                 "log_x": false,
                 "bounds_x": {
                     "type": "nrg"
                 },
                 "val_y": "theta",
-                "Nbins_y": 20,
+                "Nbins_y": 50,
                 "log_y": false,
                 "bounds_y": {
                     "type": "theta"
@@ -103,13 +103,13 @@
             "thetaXnrg": {
                 "trigger": 1,
                 "val_x": "init_theta",
-                "Nbins_x": 20,
+                "Nbins_x": 50,
                 "log_x": false,
                 "bounds_x": {
                     "type": "theta"
                 },
                 "val_y": "nrg",
-                "Nbins_y": 20,
+                "Nbins_y": 50,
                 "log_y": true,
                 "bounds_y": {
                     "type": "esc_nrg"
@@ -119,13 +119,13 @@
             "thetaXtheta": {
                 "trigger": 1,
                 "val_x": "init_theta",
-                "Nbins_x": 20,
+                "Nbins_x": 50,
                 "log_x": false,
                 "bounds_x": {
                     "type": "theta"
                 },
                 "val_y": "theta",
-                "Nbins_y": 20,
+                "Nbins_y": 50,
                 "log_y": false,
                 "bounds_y": {
                     "type": "theta"
@@ -135,13 +135,13 @@
             "finalVals": {
                 "trigger": 1,
                 "val_x": "nrg",
-                "Nbins_x": 20,
+                "Nbins_x": 50,
                 "log_x": true,
                 "bounds_x": {
                     "type": "esc_nrg"
                 },
                 "val_y": "theta",
-                "Nbins_y": 20,
+                "Nbins_y": 50,
                 "log_y": false,
                 "bounds_y": {
                     "type": "theta"
@@ -151,11 +151,11 @@
 
         "avgs": {
             "avgdata" : {
-                "Nbins_nrg": 20,
+                "Nbins_nrg": 50,
                 "bounds_nrg": {
                     "type": "nrg"
                 },
-                "Nbins_theta": 20,
+                "Nbins_theta": 50,
                 "bounds_theta": {
                     "type": "theta"
                 }
