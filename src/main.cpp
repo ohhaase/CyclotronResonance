@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include "nlohmann/json.hpp"
+#include "helper_objects/OutputHandler.hpp"
 
 // ===== Main =====
 int main(int argc, char** argv)
@@ -57,6 +58,12 @@ int main(int argc, char** argv)
         case 6:
         {
             simType6();
+            break;
+        }
+        case 7:
+        {
+            simType7(inputParams["output"]);
+
             break;
         }
         default:

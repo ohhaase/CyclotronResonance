@@ -459,3 +459,42 @@ void simType6()
         exportSimInfo();
     }
 }
+
+
+void simType7(nlohmann::json outputjson)
+{
+    // Performs as N * 2 sims, where:
+    // N is number of temps we want to study
+    // 2 because we look at recoil on/off for each
+
+    // NOTE TO FUTURE SELF: BUG WITH COPYING HISTS
+
+    std::vector<double> Thetas = {0.05, 0.025, 0.01, 0.005};
+    int recoils[2] = {0, 1}; 
+    electronDistb.setDistb(0);
+
+    // Loop over electron temeperatures
+    for (int i = 0; i < Thetas.size(); i++)
+    {
+        electronDistb.updateTemp(Thetas[i]);
+
+        // Loop over recoil
+        for (int j = 0; j < 2; j++)
+        {
+            storeSimInfo();
+            simInfo["Recoil"] = (bool)recoils[j];
+
+            // Unique folder
+            simFolder = "simData" + std::to_string(j + i*2);
+            std::filesystem::create_directory(simFolder);
+
+            OutputHandler output {outputjson};
+
+            NParticlesUniform(Nparticles, recoils[j], output);
+
+            output.writeOutputs(simFolder);
+
+            exportSimInfo();
+        }
+    }
+}
