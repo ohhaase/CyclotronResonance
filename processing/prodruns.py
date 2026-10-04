@@ -27,7 +27,7 @@ reload(postProcLib)
 
 # %%
 # data = postProcLib.importRun("prodrun2", 8)
-data = postProcLib.importRun("prodrun_singlescatterbins_100000", 8)
+data = postProcLib.importRun("prodrun_outputhandler_mac", 8)
 # data = postProcLib.importRun("prodrun_temp_0025", 2)
 # data = postProcLib.importRun("prodrun_cutoff2", 8)
 
@@ -76,8 +76,8 @@ def numPlotVals(theseParams, thisHist):
     plotVals = thisHist["totalNormalized"]
 
     # diffs = thisHist["perpNormalized"] - thisHist["parNormalized"]
-    # diffs = (thisHist["perpCounts"] - thisHist["parCounts"])/(thisHist["perpCounts"] + thisHist["parCounts"])
-    diffs = (thisHist["perpNormalized"] - thisHist["parNormalized"]) / (thisHist["perpNormalized"] + thisHist["parNormalized"])
+    diffs = (thisHist["perpCounts"] - thisHist["parCounts"])/(thisHist["perpCounts"] + thisHist["parCounts"])
+    # diffs = (thisHist["perpNormalized"] - thisHist["parNormalized"]) / (thisHist["perpNormalized"] + thisHist["parNormalized"])
 
     xWalls = thisHist["walls"]
 
