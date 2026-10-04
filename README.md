@@ -21,7 +21,9 @@ This generates a CyclotronResonance executable in ./build/.
 To run the executable, use (include `.exe` if on Windows)
 
 ```
-./build/CyclotronResonance(.exe) <Nparticles> <Nbins> <simType> <Nthreads>
+./build/CyclotronResonance(.exe) <inputfile>
 ```
 
 This will generate the resulting data in the main directory (TODO: Change output location).
+
+An example input file is included in the project (start.json). (TODO: Explain how to make an input file)

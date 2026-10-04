@@ -388,23 +388,21 @@ def recoilComparisonPlot(data, key, plotValFunc):
 
         ax.set_title(recoil)
 
-def recoilComparisonDiffPlot(data, key, plotValFunc):
-    xLabel = "variable"
-    yLabel = "Relative Counts"
-    xScale = "linear"
-    yScale = "linear"
+def recoilComparisonDiffPlot(data, plotDict):
+    key = plotDict["val"]
+    plotValFunc = plotDict["func"]
 
-    match key:
-        case "num":
-            xLabel = r"Scatter Num"
-            xScale = yScale = "log"
-        case "nrg" | "esc_nrg":
-            xLabel = r"$\omega / B$"
-            xScale = "log"
-        case "theta":
-            xLabel = r"$\cos{\Theta}$"
-        case "esc_theta":
-            xLabel = r"$\Theta$"
+    xLabel = "variable"
+    if ("xLabel" in plotDict): xLabel = plotDict["xLabel"]
+
+    yLabel = "Relative Counts"
+    if ("yLabel" in plotDict): yLabel = plotDict["yLabel"]
+
+    xScale = "linear"
+    if ("xScale" in plotDict): xScale = plotDict["xScale"]
+
+    yScale = "linear"
+    if ("yScale" in plotDict): yScale = plotDict["yScale"]
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 4))
 
@@ -413,7 +411,6 @@ def recoilComparisonDiffPlot(data, key, plotValFunc):
         subax = ax.inset_axes([0, -0.5, 1, 0.45], sharex=ax)
 
         subax.set_xlabel(xLabel)
-
 
         if (i == 0):
             recoil = "No Recoil"
@@ -444,12 +441,11 @@ def recoilComparisonDiffPlot(data, key, plotValFunc):
 
         subax.hlines(0, xWalls[0], xWalls[-1], "black", "--")
 
-        if key == "num":
-            # subax.set_ylim([-3e-3,3e-3])
-            subax.set_ylim([-5, 5])
+        subax.set_ylim([-1, 1])
 
         if (i == 0):
-            subax.set_ylabel(r"$\perp - \parallel$")
+            # subax.set_ylabel(r"$(\perp - \parallel) / (\perp + \parallel)$")
+            subax.set_ylabel("Polarization Degree")
             ax.set_ylabel(yLabel)
         
         ax.set_xscale(xScale)
@@ -463,6 +459,9 @@ def recoilComparisonDiffPlot(data, key, plotValFunc):
         subax.legend(subLegendLabels, title = r"$\parallel/\perp$", ncol=2, fontsize="small", columnspacing=1, title_fontsize="small")
 
         ax.set_title(recoil)
+
+    if ("filename" in plotDict):
+        plt.savefig(f"figures/{plotDict["filename"]}", bbox_inches="tight")
 
     plt.show()
 
