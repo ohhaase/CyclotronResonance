@@ -1,8 +1,21 @@
 #include "PhotonDistb.hpp"
 
 #include <iostream>
+#include <string>
+#include "nlohmann/json.hpp"
 #include "global_vars.hpp"
 #include "core/helper_functions.hpp"
+
+
+PhotonDistb::PhotonDistb(nlohmann::json inputDistbJSON)
+{
+    // TODO: Maybe some stuff to check that the json is setup right?
+
+    std::string distName = inputDistbJSON["type"].get<std::string>();
+
+    if (distName == "uniform") distbType = PHOTONDISTBFUNC::Uniform;
+}
+
 
 void PhotonDistb::setInputDistribution(PHOTONDISTBFUNC dist)
 {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "nlohmann/json.hpp"
+
 enum struct PHOTONDISTBFUNC
 {
     Uniform
@@ -9,6 +11,7 @@ enum struct PHOTONDISTBFUNC
 class PhotonDistb
 {
     public:
+        PhotonDistb(nlohmann::json inputDistbJSON);
 
         void setInputDistribution(PHOTONDISTBFUNC dist);
 
