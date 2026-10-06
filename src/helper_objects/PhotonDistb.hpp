@@ -1,5 +1,11 @@
 #pragma once
 
+enum struct PHOTONDISTBFUNC
+{
+    Uniform
+};
+
+
 class PhotonDistb
 {
     public:
@@ -10,7 +16,8 @@ class PhotonDistb
 
     private:
 
-        int inputType;
+        PHOTONDISTBFUNC distbType;
+        
         
         // Sampling functions
 
