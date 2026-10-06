@@ -109,7 +109,6 @@ muPlotDict = {
 }
 
 def escThetaPlotVals(theseParams, thisHist):
-    # plotVals = thisHist["totalCounts"]
     plotVals = thisHist["totalNormalized"]
 
     diffs = (thisHist["perpCounts"] - thisHist["parCounts"])/(thisHist["perpCounts"] + thisHist["parCounts"])
@@ -123,6 +122,22 @@ escThetaPlotDict = {
     "func": escThetaPlotVals,
     "xLabel": r"$\Theta$",
     "filename": "finalangles.png"
+}
+
+def escMuPlotVals(theseParams, thisHist):
+    plotVals = thisHist["totalNormalized"] / np.sin(thisHist["centers"])
+
+    diffs = (thisHist["perpCounts"] - thisHist["parCounts"])/(thisHist["perpCounts"] + thisHist["parCounts"])
+
+    xWalls = np.cos(thisHist["walls"])
+
+    return plotVals, xWalls, diffs
+
+escMuPlotDict ={
+    "val": "esc_theta",
+    "func": escMuPlotVals,
+    "xLabel": r"$\cos{\Theta}$",
+    "filename": "finalcosines.png"
 }
 
 def nrgPlotVals(theseParams, thisHist):
@@ -159,7 +174,7 @@ escNRGPlotDict = {
     "filename": "finalnrg.png"
 }
 
-dicts = [numPlotDict, muPlotDict, escThetaPlotDict, nrgPlotDict, escNRGPlotDict]
+dicts = [numPlotDict, muPlotDict, escThetaPlotDict, nrgPlotDict, escNRGPlotDict, escMuPlotDict]
 
 for thisDict in dicts:
     postProcLib.recoilComparisonDiffPlot(data, thisDict)
