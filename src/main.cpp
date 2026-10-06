@@ -63,7 +63,11 @@ int main(int argc, char** argv)
         case 7:
         {
             simType7(inputParams["output"]);
-
+            break;
+        }
+        case 8:
+        {
+            simType8(inputParams);
             break;
         }
         default:
