@@ -4,6 +4,8 @@
 #include "../helper_objects/Histogram.hpp"
 #include "../helper_objects/Histogram2D.hpp"
 #include "helper_objects/OutputHandler.hpp"
+#include "helper_objects/PhotonDistb.hpp"
+#include "nlohmann/json.hpp"
 
 
 AvgPhotonState averageNParticles(double omega, double theta, int polarization, int recoil, int Nparticles);
@@ -17,3 +19,5 @@ AvgPhotonState avgAndBinNParticles(double omega, double theta, int polarization,
 
 
 void NParticlesUniform(int Nparticles, int recoil, OutputHandler& output);
+
+void NParticlesDistb(int Nparticles, int recoil, nlohmann::json inputDistbJSON, OutputHandler& output);

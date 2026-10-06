@@ -2,11 +2,13 @@
 
 #include "../global_vars.hpp"
 #include "omp.h"
+#include "nlohmann/json.hpp"
 #include "../science_functions/scattering_functions.hpp"
 #include "../helper_objects/Histogram.hpp"
 #include "../helper_objects/Histogram2D.hpp"
 #include "helper_functions.hpp"
 #include "helper_objects/OutputHandler.hpp"
+#include "helper_objects/PhotonDistb.hpp"
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -206,6 +208,53 @@ void NParticlesUniform(int Nparticles, int recoil, OutputHandler& output)
             if (getRandom(0, 1) < 0.5) thisPol = 1;
     
             PhotonState photon{getRandom(lowerOmega, upperOmega), getRandom(0, M_PI), 0, thisPol};
+    
+            PhotonState initPhoton = photon;
+    
+            bool escaped = false; 
+            double beta = 0;
+    
+            while(!escaped)
+            {
+                beta = performScatter(photon, recoil);
+    
+                local_output.perScatterOutputs({initPhoton, photon, beta});
+    
+                escaped = hasEscaped(photon);
+            }
+    
+            local_output.perEscapeOutputs({initPhoton, photon, beta});
+        }
+
+        #pragma omp critical
+        {
+            output.combineOutputs(local_output);
+        }
+    }
+}
+
+
+void NParticlesDistb(int Nparticles, int recoil, nlohmann::json inputDistbJSON, OutputHandler& output)
+{
+    omp_set_num_threads(Nthreads);
+
+    std::vector<OutputHandler> perThreadOutputs(Nthreads, output);
+    std::vector<PhotonDistb> photonDistributions(Nthreads, inputDistbJSON); // Do I really need a separate copy for each thread?
+
+    #pragma omp parallel 
+    {
+        int thread_id = omp_get_thread_num();
+
+        OutputHandler& local_output = perThreadOutputs[thread_id];
+
+        #pragma omp for
+        for (int i = 0; i < Nparticles; i++)
+        {
+            // Initialize photon state
+            int thisPol = 0;
+            if (getRandom(0, 1) < 0.5) thisPol = 1;
+    
+            PhotonState photon{photonDistributions[thread_id].sample(), getRandom(0, M_PI), 0, thisPol};
     
             PhotonState initPhoton = photon;
     
