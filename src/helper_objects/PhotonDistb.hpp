@@ -10,7 +10,7 @@ class PhotonDistb
 {
     public:
 
-        void setInputDistribution(int dist);
+        void setInputDistribution(PHOTONDISTBFUNC dist);
 
         double sample();
 
